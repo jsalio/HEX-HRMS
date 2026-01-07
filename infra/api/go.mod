@@ -6,6 +6,7 @@ require (
 	github.com/gin-gonic/gin v1.11.0
 	github.com/golang-jwt/jwt/v5 v5.3.0
 	hrms/core v0.0.0
+	hrms/repository v0.0.0
 )
 
 require (
@@ -43,3 +44,5 @@ require (
 )
 
 replace hrms/core v0.0.0 => ../../core
+
+replace hrms/repository v0.0.0 => ../repository
