@@ -1,0 +1,8 @@
+go 1.23.9
+
+use (
+	./cmd
+	./core
+	./infra/api
+	./infra/repository
+)
