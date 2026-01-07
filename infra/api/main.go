@@ -2,9 +2,11 @@ package main
 
 import (
 	"context"
-	"hrms/infa/api/controller"
-	"hrms/infa/api/middleware"
-	BaseController "hrms/infa/api/types"
+	"hrms/core/contracts"
+	"hrms/infra/api/config"
+	"hrms/infra/api/controller"
+	"hrms/infra/api/middleware"
+	BaseController "hrms/infra/api/types"
 	"log"
 	"net/http"
 	"os"
@@ -12,11 +14,15 @@ import (
 	"syscall"
 	"time"
 
+	"hrms/repository/postgress/repo"
+
 	"github.com/gin-gonic/gin"
 )
 
 func main() {
-	server := NewServer()
+	cfg := config.LoadConfig()
+
+	server := NewServer(cfg)
 	server.StartServer()
 }
 
@@ -24,14 +30,19 @@ type Server struct {
 	router         *gin.Engine
 	appController  []BaseController.Controller
 	authMiddleware *middleware.AuthMiddleware
+	config         *config.Config
+	context        struct {
+		userContract contracts.UserContract
+	}
 }
 
-func NewServer() *Server {
+func NewServer(cfg *config.Config) *Server {
 
 	server := &Server{
 		router:         gin.New(),
 		appController:  []BaseController.Controller{},
 		authMiddleware: middleware.NewAuthMiddleware(),
+		config:         cfg,
 	}
 
 	server.SetupHeaders()
@@ -58,11 +69,18 @@ func (s *Server) SetupHeaders() {
 
 func (s *Server) SetupControllers() {
 	s.appController = []BaseController.Controller{
-		controller.NewUserController(s.authMiddleware, nil),
+		controller.NewUserController(s.authMiddleware, s.context.userContract),
 	}
 }
 
+func (s *Server) SetupContext(db any) {
+	userContract := repo.NewUserRepository(nil)
+	// userContract.(*repo.GenericCrud[models.User]).WithContext(context.Background()) //use this in case you need to set the context
+	s.context.userContract = userContract
+}
+
 func (s *Server) StartServer() {
+
 	for _, controller := range s.appController {
 		controller.RegisterRoutes(s.router.Group("/api"))
 	}
@@ -73,11 +91,11 @@ func (s *Server) StartServer() {
 	})
 
 	srv := &http.Server{
-		Addr:           ":5000",
+		Addr:           ":" + s.config.ServerPort,
 		Handler:        s.router,
-		ReadTimeout:    10 * time.Second,
-		WriteTimeout:   10 * time.Second,
-		MaxHeaderBytes: 1 << 20, // 1MB
+		ReadTimeout:    s.config.ReadTimeout,
+		WriteTimeout:   s.config.WriteTimeout,
+		MaxHeaderBytes: s.config.MaxHeaderBytes,
 	}
 
 	go func() {

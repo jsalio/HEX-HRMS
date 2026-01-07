@@ -4,8 +4,8 @@ import (
 	"hrms/core/contracts"
 	"hrms/core/models"
 	userUseCase "hrms/core/usecases/users"
-	"hrms/infa/api/middleware"
-	"hrms/infa/api/types"
+	"hrms/infra/api/middleware"
+	"hrms/infra/api/types"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
