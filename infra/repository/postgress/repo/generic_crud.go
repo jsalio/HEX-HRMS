@@ -2,6 +2,7 @@ package repo
 
 import (
 	"context"
+	"fmt"
 	"hrms/core/contracts"
 	"hrms/core/models"
 	"sync"
@@ -57,6 +58,7 @@ func (g *GenericCrud[T]) GetByFilter(filters ...models.Filter) ([]T, *models.Sys
 
 func (g *GenericCrud[T]) Create(item T) (T, *models.SystemError) {
 	if err := g.db.WithContext(g.currentContext()).Create(&item).Error; err != nil {
+		fmt.Println(err)
 		return item, models.NewSystemError(models.SystemErrorCodeValidation, models.SystemErrorTypeValidation, models.SystemErrorLevelError, "Query failed", struct{}{})
 	}
 	return item, nil

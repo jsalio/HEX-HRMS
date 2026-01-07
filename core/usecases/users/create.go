@@ -70,7 +70,9 @@ func (u *CreateUserUseCase) Validate() *models.SystemError {
 // It builds the user data from the request and passes it to the user contract to create the user.
 func (u *CreateUserUseCase) Execute() (*models.UserData, *models.SystemError) {
 	request := u.request.Build()
-	user, err := u.userContract.Create(*request.ToUser())
+	newUser := request.ToUser()
+	newUser.Active = true
+	user, err := u.userContract.Create(*newUser)
 	if err != nil {
 		return nil, err
 	}

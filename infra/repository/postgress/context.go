@@ -36,7 +36,17 @@ func NewContext(dns string) (*Context, models.SystemError) {
 }
 
 func migrate(db *gorm.DB) models.SystemError {
-	if err := db.AutoMigrate(&models.User{}, &models.Department{}); err != nil {
+	// Enable uuid-ossp extension
+	if err := db.Exec("CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\"").Error; err != nil {
+		return models.SystemError{
+			Code:    models.SystemErrorCodeMigration,
+			Type:    models.SystemErrorTypeValidation,
+			Level:   models.SystemErrorLevelError,
+			Message: "Failed to create uuid-ossp extension",
+		}
+	}
+
+	if err := db.AutoMigrate(&repo.UserGorm{}, &repo.DepartmentGorm{}); err != nil {
 		return models.SystemError{
 			Code:    models.SystemErrorCodeMigration,
 			Type:    models.SystemErrorTypeValidation,

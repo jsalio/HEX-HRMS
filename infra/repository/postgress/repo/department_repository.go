@@ -3,29 +3,40 @@ package repo
 import (
 	"hrms/core/contracts"
 	"hrms/core/models"
+	"time"
 
+	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
 type DepartmentGorm struct {
-	gorm.Model
-	Id        string         `gorm:"type:varchar(255);primarykey"`
-	Name      string         `gorm:"type:varchar(255)"`
+	ID        uuid.UUID `gorm:"type:uuid;primaryKey;default:gen_random_uuid()"`
+	Name      string    `gorm:"type:varchar(255)"`
+	CreatedAt time.Time
+	UpdatedAt time.Time
 	DeletedAt gorm.DeletedAt `gorm:"index"`
+}
+
+func (DepartmentGorm) TableName() string {
+	return "departments"
 }
 
 func (d *DepartmentGorm) ToModel() *models.Department {
 	return &models.Department{
-		ID:   d.Id,
+		ID:   fromGUIDToString(d.ID),
 		Name: d.Name,
 	}
 }
 
 func ToEntity(d *models.Department) *DepartmentGorm {
 	return &DepartmentGorm{
-		Id:   d.ID,
+		// Id:   uuid.FromStringOrNil(d.ID),
 		Name: d.Name,
 	}
+}
+
+func fromGUIDToString(id uuid.UUID) string {
+	return id.String()
 }
 
 type DepartmentRepository struct {
