@@ -1,6 +1,7 @@
 package config
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"strconv"
@@ -28,9 +29,21 @@ type Config struct {
 }
 
 func LoadConfig() *Config {
-	err := godotenv.Load()
-	if err != nil {
-		log.Println("No .env file found, using system environment variables")
+	// Try loading .env from current and parent directories
+	_ = godotenv.Load()                // Current dir
+	_ = godotenv.Load("../.env")       // Parent dir
+	_ = godotenv.Load("../../.env")    // Root (if running from infra/api/config)
+	_ = godotenv.Load("../../../.env") // Root (if running from deep inside)
+
+	dbURL := getEnv("DATABASE_URL", "")
+	if dbURL == "" {
+		dbURL = fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable",
+			getEnv("DB_HOST", "localhost"),
+			getEnv("DB_USER", "postgres"),
+			getEnv("DB_PASSWORD", "postgres"),
+			getEnv("DB_NAME", "hrms"),
+			getEnv("DB_PORT", "5432"),
+		)
 	}
 
 	return &Config{
@@ -39,7 +52,7 @@ func LoadConfig() *Config {
 		DBName:         getEnv("DB_NAME", "hrms"),
 		DBUser:         getEnv("DB_USER", "postgres"),
 		DBPassword:     getEnv("DB_PASSWORD", "postgres"),
-		DBURL:          getEnv("DATABASE_URL", ""),
+		DBURL:          dbURL,
 		ServerPort:     getEnv("SERVER_PORT", "5000"),
 		Environment:    getEnv("ENVIRONMENT", "development"),
 		JWTSecret:      getEnv("JWT_SECRET", "default_secret"),

@@ -2,7 +2,9 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"hrms/core/contracts"
+	"hrms/core/models"
 	"hrms/infra/api/config"
 	"hrms/infra/api/controller"
 	"hrms/infra/api/middleware"
@@ -14,14 +16,13 @@ import (
 	"syscall"
 	"time"
 
-	"hrms/repository/postgress/repo"
+	"hrms/repository/postgress"
 
 	"github.com/gin-gonic/gin"
 )
 
 func main() {
 	cfg := config.LoadConfig()
-
 	server := NewServer(cfg)
 	server.StartServer()
 }
@@ -32,7 +33,8 @@ type Server struct {
 	authMiddleware *middleware.AuthMiddleware
 	config         *config.Config
 	context        struct {
-		userContract contracts.UserContract
+		userContract       contracts.UserContract
+		departmentContract contracts.DepartmentContract
 	}
 }
 
@@ -46,6 +48,7 @@ func NewServer(cfg *config.Config) *Server {
 	}
 
 	server.SetupHeaders()
+	server.SetupContext()
 	server.SetupControllers()
 
 	return server
@@ -73,10 +76,14 @@ func (s *Server) SetupControllers() {
 	}
 }
 
-func (s *Server) SetupContext(db any) {
-	userContract := repo.NewUserRepository(nil)
-	// userContract.(*repo.GenericCrud[models.User]).WithContext(context.Background()) //use this in case you need to set the context
-	s.context.userContract = userContract
+func (s *Server) SetupContext() {
+	fmt.Println("Setting up context")
+	context, err := postgress.NewContext(s.config.DBURL)
+	if err.Code != models.SystemErrorCodeNone {
+		log.Fatal("Failed to get gorm config", err)
+	}
+	s.context.userContract = context.UserContract
+	s.context.departmentContract = context.DepartmentContract
 }
 
 func (s *Server) StartServer() {

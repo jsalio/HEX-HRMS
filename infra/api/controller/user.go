@@ -6,6 +6,7 @@ import (
 	userUseCase "hrms/core/usecases/users"
 	"hrms/infra/api/middleware"
 	"hrms/infra/api/types"
+	"hrms/repository/postgress/repo"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -25,8 +26,15 @@ func NewUserController(authMiddleware *middleware.AuthMiddleware, userContract c
 	}
 }
 
+func (uc *UserController) SetContext(c *gin.Context) {
+	if r, ok := uc.userContract.(*repo.UserRepository); ok {
+		r.WithContext(c.Request.Context())
+	}
+}
+
 func (uc *UserController) CreateUser(c *gin.Context) {
 	var body models.CreateUser
+	uc.SetContext(c)
 	_, err := uc.BaseController.GetBody(c, &body)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Message})
@@ -55,6 +63,7 @@ func (uc *UserController) RegisterRoutes(router *gin.RouterGroup) {
 	{
 		public.POST("/", uc.CreateUser)
 		public.POST("/login", func(ctx *gin.Context) {
+			uc.SetContext(ctx)
 			ctx.JSON(http.StatusOK, gin.H{"message": "Login successful"})
 		})
 	}
