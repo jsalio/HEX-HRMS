@@ -25,8 +25,8 @@ func (UserGorm) TableName() string {
 	return "users"
 }
 
-func ToModel(entity *models.User) *UserGorm {
-	return &UserGorm{
+func ToModel(entity models.User) UserGorm {
+	return UserGorm{
 		// Id:       uuid.FromStringOrNil(entity.ID),
 		Username: entity.Username,
 		Password: entity.Password,
@@ -36,8 +36,8 @@ func ToModel(entity *models.User) *UserGorm {
 	}
 }
 
-func ToEntityUser(gorm *UserGorm) *models.User {
-	return &models.User{
+func ToEntityUser(gorm UserGorm) models.User {
+	return models.User{
 		ID:       fromGUIDToString(gorm.ID),
 		Username: gorm.Username,
 		Password: gorm.Password,
@@ -48,11 +48,11 @@ func ToEntityUser(gorm *UserGorm) *models.User {
 }
 
 type UserRepository struct {
-	GenericCrud[models.User]
+	GenericCrud[models.User, UserGorm]
 }
 
 func NewUserRepository(db *gorm.DB) contracts.UserContract {
 	return &UserRepository{
-		GenericCrud: NewGenericCrud[models.User](db),
+		GenericCrud: NewGenericCrud(db, ToModel, ToEntityUser),
 	}
 }

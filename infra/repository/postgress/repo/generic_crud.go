@@ -2,32 +2,32 @@ package repo
 
 import (
 	"context"
-	"fmt"
-	"hrms/core/contracts"
 	"hrms/core/models"
 	"sync"
 
 	"gorm.io/gorm"
 )
 
-type GenericCrud[T any] struct {
-	db  *gorm.DB
-	mu  sync.RWMutex    // protege el acceso concurrente al contexto
-	ctx context.Context // contexto actual (por defecto Background)
-	contracts.ReadOperation[T]
-	contracts.WriteOperation[T]
+type GenericCrud[T any, G any] struct {
+	db       *gorm.DB
+	mu       sync.RWMutex
+	ctx      context.Context
+	ToGorm   func(T) G
+	ToEntity func(G) T
 }
 
-func NewGenericCrud[T any](db *gorm.DB) GenericCrud[T] {
-	return GenericCrud[T]{
-		db:  db,
-		ctx: context.Background(),
+func NewGenericCrud[T any, G any](db *gorm.DB, toGorm func(T) G, toEntity func(G) T) GenericCrud[T, G] {
+	return GenericCrud[T, G]{
+		db:       db,
+		ctx:      context.Background(),
+		ToGorm:   toGorm,
+		ToEntity: toEntity,
 	}
 }
 
 // WithContext permite inyectar un context (normalmente desde un handler HTTP)
 // Devuelve el mismo puntero para permitir encadenamiento
-func (g *GenericCrud[T]) WithContext(ctx context.Context) *GenericCrud[T] {
+func (g *GenericCrud[T, G]) WithContext(ctx context.Context) *GenericCrud[T, G] {
 	if ctx == nil {
 		ctx = context.Background()
 	}
@@ -38,42 +38,49 @@ func (g *GenericCrud[T]) WithContext(ctx context.Context) *GenericCrud[T] {
 }
 
 // currentContext obtiene el contexto actual de forma segura
-func (g *GenericCrud[T]) currentContext() context.Context {
+func (g *GenericCrud[T, G]) currentContext() context.Context {
 	g.mu.RLock()
 	defer g.mu.RUnlock()
 	return g.ctx
 }
 
-func (g *GenericCrud[T]) GetByFilter(filters ...models.Filter) ([]T, *models.SystemError) {
-	var gormModel []T
-	query := g.db
+func (g *GenericCrud[T, G]) GetByFilter(filters ...models.Filter) ([]T, *models.SystemError) {
+	var gormModels []G
+	query := g.db.WithContext(g.currentContext())
 	for _, filter := range filters {
-		query = query.WithContext(g.currentContext()).Where(filter.Key+" = ?", filter.Value)
+		query = query.Where(filter.Key+" = ?", filter.Value)
 	}
-	if err := query.Find(&gormModel).Error; err != nil {
+	if err := query.Find(&gormModels).Error; err != nil {
 		return nil, models.NewSystemError(models.SystemErrorCodeValidation, models.SystemErrorTypeValidation, models.SystemErrorLevelError, "Query failed", struct{}{})
 	}
-	return gormModel, nil
+
+	var entities []T
+	for _, gm := range gormModels {
+		entities = append(entities, g.ToEntity(gm))
+	}
+	return entities, nil
 }
 
-func (g *GenericCrud[T]) Create(item T) (T, *models.SystemError) {
-	if err := g.db.WithContext(g.currentContext()).Create(&item).Error; err != nil {
-		fmt.Println(err)
+func (g *GenericCrud[T, G]) Create(item T) (T, *models.SystemError) {
+	gormModel := g.ToGorm(item)
+	if err := g.db.WithContext(g.currentContext()).Create(&gormModel).Error; err != nil {
 		return item, models.NewSystemError(models.SystemErrorCodeValidation, models.SystemErrorTypeValidation, models.SystemErrorLevelError, "Query failed", struct{}{})
 	}
-	return item, nil
+	return g.ToEntity(gormModel), nil
 }
 
-func (g *GenericCrud[T]) Update(id string, item T) (interface{}, *models.SystemError) {
-	if err := g.db.WithContext(g.currentContext()).Save(&item).Error; err != nil {
-		return nil, models.NewSystemError(models.SystemErrorCodeValidation, models.SystemErrorTypeValidation, models.SystemErrorLevelError, "Query failed", struct{}{})
+func (g *GenericCrud[T, G]) Update(id string, item T) (interface{}, *models.SystemError) {
+	gormModel := g.ToGorm(item)
+	if err := g.db.WithContext(g.currentContext()).Save(&gormModel).Error; err != nil {
+		return nil, models.NewSystemError(models.SystemErrorCodeValidation, models.SystemErrorTypeValidation, models.SystemErrorLevelError, "Update failed", struct{}{})
 	}
-	return item, nil
+	return g.ToEntity(gormModel), nil
 }
 
-func (g *GenericCrud[T]) Delete(id string) (interface{}, error) {
-	if err := g.db.WithContext(g.currentContext()).Where("id = ?", id).Delete(new(T)).Error; err != nil {
-		return nil, models.NewSystemError(models.SystemErrorCodeValidation, models.SystemErrorTypeValidation, models.SystemErrorLevelError, "Query failed", struct{}{})
+func (g *GenericCrud[T, G]) Delete(id string) (interface{}, error) {
+	var gormModel G
+	if err := g.db.WithContext(g.currentContext()).Where("id = ?", id).Delete(&gormModel).Error; err != nil {
+		return nil, models.NewSystemError(models.SystemErrorCodeValidation, models.SystemErrorTypeValidation, models.SystemErrorLevelError, "Delete failed", struct{}{})
 	}
-	return *new(T), nil
+	return nil, nil
 }

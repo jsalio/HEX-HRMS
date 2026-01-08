@@ -21,15 +21,15 @@ func (DepartmentGorm) TableName() string {
 	return "departments"
 }
 
-func (d *DepartmentGorm) ToModel() *models.Department {
-	return &models.Department{
+func (d DepartmentGorm) ToModel() models.Department {
+	return models.Department{
 		ID:   fromGUIDToString(d.ID),
 		Name: d.Name,
 	}
 }
 
-func ToEntity(d *models.Department) *DepartmentGorm {
-	return &DepartmentGorm{
+func ToEntity(d models.Department) DepartmentGorm {
+	return DepartmentGorm{
 		// Id:   uuid.FromStringOrNil(d.ID),
 		Name: d.Name,
 	}
@@ -40,12 +40,12 @@ func fromGUIDToString(id uuid.UUID) string {
 }
 
 type DepartmentRepository struct {
-	GenericCrud[models.Department]
+	GenericCrud[models.Department, DepartmentGorm]
 }
 
 func NewDepartmentRepository(db *gorm.DB) contracts.DepartmentContract {
 	return &DepartmentRepository{
-		GenericCrud: NewGenericCrud[models.Department](db),
+		GenericCrud: NewGenericCrud(db, ToEntity, (DepartmentGorm).ToModel),
 	}
 }
 

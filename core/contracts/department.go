@@ -17,5 +17,5 @@ type DepartmentContract interface {
 	// define basic write operations
 	WriteOperation[models.Department]
 
-	// SomeMethod() models.SystemError
+	SomeMethod() models.SystemError
 }
