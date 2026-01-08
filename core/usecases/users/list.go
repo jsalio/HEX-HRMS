@@ -42,12 +42,12 @@ import (
 //	}
 type ListUserUseCase struct {
 	userContract contracts.UserContract
-	request      contracts.IGenericRequest[[]models.Filter]
+	request      contracts.IGenericRequest[models.Filters]
 }
 
 // NewListUserUseCase creates a new instance of ListUserUseCase.
 // It injects the user contract (dependency inversion) and the request data.
-func NewListUserUseCase(userContract contracts.UserContract, request contracts.IGenericRequest[[]models.Filter]) *ListUserUseCase {
+func NewListUserUseCase(userContract contracts.UserContract, request contracts.IGenericRequest[models.Filters]) *ListUserUseCase {
 	return &ListUserUseCase{
 		userContract: userContract,
 		request:      request,

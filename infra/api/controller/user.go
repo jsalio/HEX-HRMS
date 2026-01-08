@@ -91,12 +91,46 @@ func (uc *UserController) LoginUser(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Login successful", "token": tokenData})
 }
 
+func (uc *UserController) LogoutUser(c *gin.Context) {
+	c.JSON(http.StatusOK, gin.H{"message": "Logout successful"})
+}
+
+func (uc *UserController) Me(c *gin.Context) {
+	c.JSON(http.StatusOK, gin.H{"message": "Me successful"})
+}
+
+func (uc *UserController) ListUsers(c *gin.Context) {
+	filters := models.Filters{}
+	request := contracts.NewGenericRequest(filters)
+	users := userUseCase.NewListUserUseCase(uc.userContract, request)
+	if err := users.Validate(); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Message})
+		c.Abort()
+		return
+	}
+	data, err := users.Execute()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Message})
+		c.Abort()
+		return
+	}
+	c.JSON(http.StatusOK, data)
+}
+
 func (uc *UserController) RegisterRoutes(router *gin.RouterGroup) {
 	uc.authMiddleware.Config.AddPublicRoute("POST", "/api/auth")
-	public := router.Group("/auth")
+	uc.authMiddleware.Config.AddPublicRoute("POST", "/api/auth/login")
+	routeController := router.Group("/auth")
+	public := routeController.Group("/")
 	{
-		public.POST("/", uc.CreateUser)
 		public.POST("/login", uc.LoginUser)
+	}
+	private := router.Group("/auth")
+	private.Use(uc.authMiddleware.AuthMiddleware())
+	{
+		private.GET("/me", uc.Me)
+		private.GET("/list", uc.ListUsers)
+		private.POST("/", uc.CreateUser)
 	}
 	//return router
 }
