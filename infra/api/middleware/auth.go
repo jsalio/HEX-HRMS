@@ -80,17 +80,18 @@ func (m *AuthMiddleware) AuthMiddleware() gin.HandlerFunc {
 
 		if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 			c.Set("userID", claims["sub"])
+			c.Set("data", claims["data"])
 		}
 
 		c.Next()
 	}
 }
 
-func (m *AuthMiddleware) GenerateToken(userID string) (string, error) {
+func (m *AuthMiddleware) GenerateToken(userID string, data map[string]interface{}) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"sub": userID,
-
-		"exp": jwt.NewNumericDate(time.Now().Add(24 * time.Hour)),
+		"sub":  userID,
+		"data": data,
+		"exp":  jwt.NewNumericDate(time.Now().Add(24 * time.Hour)),
 	})
 	tokenString, err := token.SignedString(m.secretKey)
 	if err != nil {

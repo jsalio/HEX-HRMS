@@ -38,6 +38,11 @@ type UserData struct {
 	Type     UserType
 }
 
+type LoginUser struct {
+	Username string
+	Password string
+}
+
 func (u *User) ToUserData() *UserData {
 	return &UserData{
 		ID:       u.ID,

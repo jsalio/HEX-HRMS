@@ -63,6 +63,16 @@ func (u *CreateUserUseCase) Validate() *models.SystemError {
 		return err
 	}
 
+	user, err := u.userContract.GetByFilter(models.Filter{
+		Key:   "username",
+		Value: request.Username,
+	})
+	if err != nil {
+		return err
+	}
+	if user != nil {
+		return models.NewSystemError(models.SystemErrorCodeInternal, models.SystemErrorTypeValidation, models.SystemErrorLevelError, "El usuario ya existe", struct{}{})
+	}
 	return nil
 }
 
