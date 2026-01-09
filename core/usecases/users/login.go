@@ -6,14 +6,16 @@ import (
 )
 
 type LoginUserUseCase struct {
-	userContract contracts.UserContract
-	request      contracts.IGenericRequest[models.LoginUser]
+	userContract         contracts.UserContract
+	request              contracts.IGenericRequest[models.LoginUser]
+	cryptographyContract contracts.CryptographyContract
 }
 
-func NewLoginUserUseCase(userContract contracts.UserContract, request contracts.IGenericRequest[models.LoginUser]) *LoginUserUseCase {
+func NewLoginUserUseCase(userContract contracts.UserContract, request contracts.IGenericRequest[models.LoginUser], cryptographyContract contracts.CryptographyContract) *LoginUserUseCase {
 	return &LoginUserUseCase{
-		userContract: userContract,
-		request:      request,
+		userContract:         userContract,
+		request:              request,
+		cryptographyContract: cryptographyContract,
 	}
 }
 
@@ -33,7 +35,12 @@ func (u *LoginUserUseCase) Validate() *models.SystemError {
 		return models.NewSystemError(models.SystemErrorCodeInternal, models.SystemErrorTypeValidation, models.SystemErrorLevelError, "El usuario no existe", struct{}{})
 	}
 
-	if user[0].Password != request.Password {
+	// Compare the plain text password with the hashed password
+	isValid, err := u.cryptographyContract.ComparePassword(request.Password, user[0].Password)
+	if err != nil {
+		return err
+	}
+	if !isValid {
 		return models.NewSystemError(models.SystemErrorCodeInternal, models.SystemErrorTypeValidation, models.SystemErrorLevelError, "Contraseña incorrecta", struct{}{})
 	}
 

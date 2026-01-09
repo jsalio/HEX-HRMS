@@ -1,0 +1,6 @@
+export interface Filter {
+  key: string;
+  value: any;
+}
+
+export type Filters = Filter[];

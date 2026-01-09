@@ -69,7 +69,8 @@ func (uc *UserController) LoginUser(c *gin.Context) {
 		c.Abort()
 		return
 	}
-	useCase := userUseCase.NewLoginUserUseCase(uc.userContract, contracts.NewGenericRequest(body))
+
+	useCase := userUseCase.NewLoginUserUseCase(uc.userContract, contracts.NewGenericRequest(body), uc.cryptographyContract)
 	if err := useCase.Validate(); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Message})
 		c.Abort()
