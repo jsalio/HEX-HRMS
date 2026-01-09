@@ -16,7 +16,7 @@ import (
 	"hrms.local/infra/api/controller"
 	"hrms.local/infra/api/middleware"
 	BaseController "hrms.local/infra/api/types"
-	"hrms.local/security/cryptography"
+	"hrms.local/security"
 
 	"hrms.local/repository/postgress"
 
@@ -81,6 +81,7 @@ func (s *Server) SetupContext() {
 	}
 	s.context.userContract = context.UserContract
 	s.context.departmentContract = context.DepartmentContract
+	s.cryptographyContext = security.NewSecurityImpl()
 }
 
 func (s *Server) StartServer() {
@@ -101,7 +102,6 @@ func (s *Server) StartServer() {
 		WriteTimeout:   s.config.WriteTimeout,
 		MaxHeaderBytes: s.config.MaxHeaderBytes,
 	}
-	s.cryptographyContext = cryptography.NewCryptographyContext()
 
 	go func() {
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {

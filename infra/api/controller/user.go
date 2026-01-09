@@ -127,13 +127,14 @@ func (uc *UserController) RegisterRoutes(router *gin.RouterGroup) {
 	public := routeController.Group("/")
 	{
 		public.POST("/login", uc.LoginUser)
+		public.POST("/", uc.CreateUser)
 	}
 	private := router.Group("/auth")
 	private.Use(uc.authMiddleware.AuthMiddleware())
 	{
 		private.GET("/me", uc.Me)
 		private.GET("/list", uc.ListUsers)
-		private.POST("/", uc.CreateUser)
+
 	}
 	//return router
 }
