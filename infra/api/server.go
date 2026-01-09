@@ -3,18 +3,20 @@ package api
 import (
 	"context"
 	"fmt"
-	"hrms.local/core/contracts"
-	"hrms.local/core/models"
-	"hrms.local/infra/api/config"
-	"hrms.local/infra/api/controller"
-	"hrms.local/infra/api/middleware"
-	BaseController "hrms.local/infra/api/types"
 	"log"
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
+
+	"hrms.local/core/contracts"
+	"hrms.local/core/models"
+	"hrms.local/infra/api/config"
+	"hrms.local/infra/api/controller"
+	"hrms.local/infra/api/middleware"
+	BaseController "hrms.local/infra/api/types"
+	"hrms.local/security/cryptography"
 
 	"hrms.local/repository/postgress"
 
@@ -30,6 +32,7 @@ type Server struct {
 		userContract       contracts.UserContract
 		departmentContract contracts.DepartmentContract
 	}
+	cryptographyContext contracts.CryptographyContract
 }
 
 func NewServer(cfg *config.Config) *Server {
@@ -66,7 +69,7 @@ func (s *Server) SetupHeaders() {
 
 func (s *Server) SetupControllers() {
 	s.appController = []BaseController.Controller{
-		controller.NewUserController(s.authMiddleware, s.context.userContract),
+		controller.NewUserController(s.authMiddleware, s.context.userContract, s.cryptographyContext),
 	}
 }
 
@@ -98,6 +101,7 @@ func (s *Server) StartServer() {
 		WriteTimeout:   s.config.WriteTimeout,
 		MaxHeaderBytes: s.config.MaxHeaderBytes,
 	}
+	s.cryptographyContext = cryptography.NewCryptographyContext()
 
 	go func() {
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {

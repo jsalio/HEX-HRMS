@@ -51,6 +51,7 @@ require (
 	google.golang.org/protobuf v1.36.9 // indirect
 	gorm.io/driver/postgres v1.6.0 // indirect
 	gorm.io/gorm v1.31.1 // indirect
+	hrms.local/security v0.0.0
 )
 
-
+replace hrms.local/security v0.0.0 => ../../boundaries/security

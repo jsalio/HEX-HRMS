@@ -1,28 +1,31 @@
 package controller
 
 import (
+	"net/http"
+
 	"hrms.local/core/contracts"
 	"hrms.local/core/models"
 	userUseCase "hrms.local/core/usecases/users"
 	"hrms.local/infra/api/middleware"
 	"hrms.local/infra/api/types"
 	"hrms.local/repository/postgress/repo"
-	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
 
 type UserController struct {
 	*types.BaseController
-	userContract   contracts.UserContract
-	authMiddleware *middleware.AuthMiddleware
+	userContract         contracts.UserContract
+	authMiddleware       *middleware.AuthMiddleware
+	cryptographyContract contracts.CryptographyContract
 }
 
-func NewUserController(authMiddleware *middleware.AuthMiddleware, userContract contracts.UserContract) *UserController {
+func NewUserController(authMiddleware *middleware.AuthMiddleware, userContract contracts.UserContract, cryptographyContract contracts.CryptographyContract) *UserController {
 	return &UserController{
-		BaseController: types.NewBaseController("/auth"),
-		userContract:   userContract,
-		authMiddleware: authMiddleware,
+		BaseController:       types.NewBaseController("/auth"),
+		userContract:         userContract,
+		authMiddleware:       authMiddleware,
+		cryptographyContract: cryptographyContract,
 	}
 }
 
@@ -42,7 +45,7 @@ func (uc *UserController) CreateUser(c *gin.Context) {
 		return
 	}
 
-	useCase := userUseCase.NewCreateUserUseCase(uc.userContract, contracts.NewGenericRequest(body))
+	useCase := userUseCase.NewCreateUserUseCase(uc.userContract, contracts.NewGenericRequest(body), uc.cryptographyContract)
 	if err := useCase.Validate(); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Message})
 		c.Abort()

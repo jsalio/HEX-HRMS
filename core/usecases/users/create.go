@@ -41,16 +41,18 @@ import (
 //
 //	fmt.Printf("User created: %s\n", createdUser.Username)
 type CreateUserUseCase struct {
-	userContract contracts.UserContract
-	request      contracts.IGenericRequest[models.CreateUser]
+	userContract    contracts.UserContract
+	request         contracts.IGenericRequest[models.CreateUser]
+	securityContext contracts.CryptographyContract
 }
 
 // NewCreateUserUseCase creates a new instance of CreateUserUseCase.
 // It injects the user contract (dependency inversion) and the request data.
-func NewCreateUserUseCase(userContract contracts.UserContract, request contracts.IGenericRequest[models.CreateUser]) *CreateUserUseCase {
+func NewCreateUserUseCase(userContract contracts.UserContract, request contracts.IGenericRequest[models.CreateUser], securityContext contracts.CryptographyContract) *CreateUserUseCase {
 	return &CreateUserUseCase{
-		userContract: userContract,
-		request:      request,
+		userContract:    userContract,
+		request:         request,
+		securityContext: securityContext,
 	}
 }
 
@@ -82,6 +84,11 @@ func (u *CreateUserUseCase) Execute() (*models.UserData, *models.SystemError) {
 	request := u.request.Build()
 	newUser := request.ToUser()
 	newUser.Active = true
+	password, err := u.securityContext.EncodePassword(request.Password)
+	if err != nil {
+		return nil, err
+	}
+	newUser.Password = password
 	user, err := u.userContract.Create(*newUser)
 	if err != nil {
 		return nil, err
