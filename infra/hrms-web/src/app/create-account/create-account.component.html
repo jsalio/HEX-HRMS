@@ -1,0 +1,146 @@
+<div
+    class="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-600 via-secondary-600 to-accent-600 p-4 animate-fade-in">
+    <!-- Background animated circles -->
+    <div class="absolute inset-0 overflow-hidden pointer-events-none">
+        <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-primary-400/30 rounded-full blur-3xl animate-pulse-slow">
+        </div>
+        <div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-accent-400/30 rounded-full blur-3xl animate-pulse-slow"
+            style="animation-delay: 1s;"></div>
+    </div>
+
+    <!-- Create Account Card -->
+    <div class="relative w-full max-w-md animate-slide-up">
+        <div class="bg-white/10 backdrop-blur-xl rounded-3xl shadow-2xl p-8 border border-white/20">
+            <!-- Logo/Header -->
+            <div class="text-center mb-8">
+                <div
+                    class="inline-flex items-center justify-center w-16 h-16 bg-white/20 backdrop-blur-sm rounded-2xl mb-4 shadow-lg">
+                    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z">
+                        </path>
+                    </svg>
+                </div>
+                <h1 class="text-3xl font-bold text-white mb-2">Create Account</h1>
+                <p class="text-white/80 text-sm">Join the HRMS platform</p>
+            </div>
+
+            <!-- Create Account Form -->
+            <form [formGroup]="createAccountForm" (ngSubmit)="onSubmit()" class="space-y-5">
+                <!-- Username Field -->
+                <div class="space-y-2">
+                    <label for="username" class="block text-sm font-medium text-white/90">Username</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                            <svg class="h-5 w-5 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                            </svg>
+                        </div>
+                        <input id="username" type="text" formControlName="username" placeholder="johndoe"
+                            class="w-full pl-12 pr-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/50 focus:border-transparent transition-all duration-300 backdrop-blur-sm"
+                            [class.border-red-400]="username?.invalid && username?.touched" />
+                    </div>
+                    <p *ngIf="username?.invalid && username?.touched" class="text-red-300 text-xs mt-1 ml-1">
+                        <span *ngIf="username?.errors?.['required']">Username is required</span>
+                        <span *ngIf="username?.errors?.['minlength']">Username must be at least 3 characters</span>
+                    </p>
+                </div>
+
+                <!-- Email Field -->
+                <div class="space-y-2">
+                    <label for="email" class="block text-sm font-medium text-white/90">Email Address</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                            <svg class="h-5 w-5 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207">
+                                </path>
+                            </svg>
+                        </div>
+                        <input id="email" type="email" formControlName="email" placeholder="you@example.com"
+                            class="w-full pl-12 pr-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/50 focus:border-transparent transition-all duration-300 backdrop-blur-sm"
+                            [class.border-red-400]="email?.invalid && email?.touched" />
+                    </div>
+                    <p *ngIf="email?.invalid && email?.touched" class="text-red-300 text-xs mt-1 ml-1">
+                        <span *ngIf="email?.errors?.['required']">Email is required</span>
+                        <span *ngIf="email?.errors?.['email']">Please enter a valid email</span>
+                    </p>
+                </div>
+
+                <!-- Password Field -->
+                <div class="space-y-2">
+                    <label for="password" class="block text-sm font-medium text-white/90">Password</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                            <svg class="h-5 w-5 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z">
+                                </path>
+                            </svg>
+                        </div>
+                        <input id="password" type="password" formControlName="password" placeholder="••••••••"
+                            class="w-full pl-12 pr-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/50 focus:border-transparent transition-all duration-300 backdrop-blur-sm"
+                            [class.border-red-400]="password?.invalid && password?.touched" />
+                    </div>
+                    <p *ngIf="password?.invalid && password?.touched" class="text-red-300 text-xs mt-1 ml-1">
+                        <span *ngIf="password?.errors?.['required']">Password is required</span>
+                        <span *ngIf="password?.errors?.['minlength']">Password must be at least 6 characters</span>
+                    </p>
+                </div>
+
+                <!-- Confirm Password Field -->
+                <div class="space-y-2">
+                    <label for="confirmPassword" class="block text-sm font-medium text-white/90">Confirm
+                        Password</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                            <svg class="h-5 w-5 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                        </div>
+                        <input id="confirmPassword" type="password" formControlName="confirmPassword"
+                            placeholder="••••••••"
+                            class="w-full pl-12 pr-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/50 focus:border-transparent transition-all duration-300 backdrop-blur-sm"
+                            [class.border-red-400]="confirmPassword?.invalid && confirmPassword?.touched" />
+                    </div>
+                    <p *ngIf="confirmPassword?.invalid && confirmPassword?.touched"
+                        class="text-red-300 text-xs mt-1 ml-1">
+                        <span *ngIf="confirmPassword?.errors?.['required']">Please confirm your password</span>
+                        <span *ngIf="confirmPassword?.errors?.['passwordMismatch']">Passwords do not match</span>
+                    </p>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" [disabled]="isSubmitting"
+                    class="w-full py-3 px-4 bg-white text-primary-700 rounded-xl font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none focus:outline-none focus:ring-2 focus:ring-white/50 focus:ring-offset-2 focus:ring-offset-primary-600">
+                    <span *ngIf="!isSubmitting">Create Account</span>
+                    <span *ngIf="isSubmitting" class="flex items-center justify-center">
+                        <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-primary-700" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4">
+                            </circle>
+                            <path class="opacity-75" fill="currentColor"
+                                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                            </path>
+                        </svg>
+                        Creating account...
+                    </span>
+                </button>
+            </form>
+
+            <!-- Sign In Link -->
+            <div class="mt-6 text-center">
+                <p class="text-white/70 text-sm">
+                    Already have an account?
+                    <a href="/login" class="text-white font-semibold hover:underline ml-1">Sign in</a>
+                </p>
+            </div>
+        </div>
+
+        <!-- Footer Text -->
+        <p class="text-center text-white/60 text-xs mt-6">
+            © 2026 HEX HRMS. All rights reserved.
+        </p>
+    </div>
+</div>
