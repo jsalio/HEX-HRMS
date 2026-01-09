@@ -1,6 +1,6 @@
 package contracts
 
-import "hrms/core/models"
+import "hrms.local/core/models"
 
 // define basic write operations
 type WriteOperation[T any] interface {

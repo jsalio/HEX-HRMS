@@ -1,7 +1,7 @@
 package contracts
 
 import (
-	"hrms/core/models"
+	"hrms.local/core/models"
 )
 
 // define basic user operations

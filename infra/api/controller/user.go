@@ -1,12 +1,12 @@
 package controller
 
 import (
-	"hrms/core/contracts"
-	"hrms/core/models"
-	userUseCase "hrms/core/usecases/users"
-	"hrms/infra/api/middleware"
-	"hrms/infra/api/types"
-	"hrms/repository/postgress/repo"
+	"hrms.local/core/contracts"
+	"hrms.local/core/models"
+	userUseCase "hrms.local/core/usecases/users"
+	"hrms.local/infra/api/middleware"
+	"hrms.local/infra/api/types"
+	"hrms.local/repository/postgress/repo"
 	"net/http"
 
 	"github.com/gin-gonic/gin"

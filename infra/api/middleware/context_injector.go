@@ -1,7 +1,7 @@
 package middleware
 
 import (
-	"hrms/repository/postgress/repo"
+	"hrms.local/repository/postgress/repo"
 	"net/http"
 )
 

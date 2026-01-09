@@ -1,8 +1,15 @@
 go 1.23.9
 
 use (
+	./boundaries/security
 	./cmd
 	./core
 	./infra/api
 	./infra/repository
 )
+
+replace hrms.local/core v0.0.0 => ./core
+
+replace hrms.local/infra/api v0.0.0 => ./infra/api
+
+replace hrms.local/repository v0.0.0 => ./infra/repository

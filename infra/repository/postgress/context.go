@@ -1,9 +1,9 @@
 package postgress
 
 import (
-	"hrms/core/contracts"
-	"hrms/core/models"
-	"hrms/repository/postgress/repo"
+	"hrms.local/core/contracts"
+	"hrms.local/core/models"
+	"hrms.local/repository/postgress/repo"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"

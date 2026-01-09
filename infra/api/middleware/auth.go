@@ -2,7 +2,7 @@ package middleware
 
 import (
 	"fmt"
-	"hrms/core/models"
+	"hrms.local/core/models"
 	"net/http"
 	"os"
 	"strings"

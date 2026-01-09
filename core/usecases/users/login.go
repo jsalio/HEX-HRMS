@@ -1,8 +1,8 @@
 package user
 
 import (
-	"hrms/core/contracts"
-	"hrms/core/models"
+	"hrms.local/core/contracts"
+	"hrms.local/core/models"
 )
 
 type LoginUserUseCase struct {

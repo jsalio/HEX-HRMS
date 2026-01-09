@@ -1,14 +1,14 @@
-package main
+package api
 
 import (
 	"context"
 	"fmt"
-	"hrms/core/contracts"
-	"hrms/core/models"
-	"hrms/infra/api/config"
-	"hrms/infra/api/controller"
-	"hrms/infra/api/middleware"
-	BaseController "hrms/infra/api/types"
+	"hrms.local/core/contracts"
+	"hrms.local/core/models"
+	"hrms.local/infra/api/config"
+	"hrms.local/infra/api/controller"
+	"hrms.local/infra/api/middleware"
+	BaseController "hrms.local/infra/api/types"
 	"log"
 	"net/http"
 	"os"
@@ -16,16 +16,10 @@ import (
 	"syscall"
 	"time"
 
-	"hrms/repository/postgress"
+	"hrms.local/repository/postgress"
 
 	"github.com/gin-gonic/gin"
 )
-
-func main() {
-	cfg := config.LoadConfig()
-	server := NewServer(cfg)
-	server.StartServer()
-}
 
 type Server struct {
 	router         *gin.Engine

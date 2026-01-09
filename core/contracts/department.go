@@ -1,6 +1,6 @@
 package contracts
 
-import "hrms/core/models"
+import "hrms.local/core/models"
 
 // define basic department operations
 // example :

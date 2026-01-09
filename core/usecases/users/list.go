@@ -1,8 +1,8 @@
 package user
 
 import (
-	"hrms/core/contracts"
-	"hrms/core/models"
+	"hrms.local/core/contracts"
+	"hrms.local/core/models"
 )
 
 // ListUserUseCase handles the retrieval of users based on specific filters.

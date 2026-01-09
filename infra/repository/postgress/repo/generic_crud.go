@@ -2,7 +2,7 @@ package repo
 
 import (
 	"context"
-	"hrms/core/models"
+	"hrms.local/core/models"
 	"sync"
 
 	"gorm.io/gorm"
