@@ -1,4 +1,7 @@
+import { InjectionToken } from "@angular/core";
 import { CreateUser, Filter, LoginUser, ModifyUser, User, UserData } from "../models";
+
+export const USER_REPOSITORY = new InjectionToken<UserRepository>('USER_REPOSITORY');
 
 export interface UserRepository {
     // getUserById(id: string): Promise<User | null>;

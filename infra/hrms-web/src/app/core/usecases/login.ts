@@ -1,7 +1,8 @@
-import { Inject } from "@angular/core";
-import { USER_REPOSITORY } from "../../app.config";
+import { Inject, Injectable } from "@angular/core";
 import { LoginUser, UserData } from "../domain/models";
-import { UserRepository } from "../domain/ports/user.repo";
+import { UserRepository, USER_REPOSITORY } from "../domain/ports/user.repo";
+
+@Injectable({ providedIn: 'root' })
 
 export class LoginUserUseCase {
     /**

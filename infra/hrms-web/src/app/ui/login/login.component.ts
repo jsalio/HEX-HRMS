@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { LoginUserUseCase } from '../../core/usecases/login';
-import { UserApiRepository } from '../../infrastructure/userApiRepository.service';
 
 @Component({
   selector: 'app-login',
@@ -16,7 +15,7 @@ export class LoginComponent implements OnInit {
   isSubmitting = false;
 
   constructor(private fb: FormBuilder, 
-    private uc :UserApiRepository
+    private loginUseCase: LoginUserUseCase
   ) {}
 
   ngOnInit(): void {
@@ -34,7 +33,7 @@ export class LoginComponent implements OnInit {
       debugger
       // TODO: Implement actual authentication logic
       //console.log('Login attempt:', { email, password, rememberMe });
-      this.uc.login({username:email, password}).then(() => {
+      this.loginUseCase.Execute({username:email, password}).then(() => {
         this.isSubmitting = false;
         console.log('Login successful!');
       }).catch(() => {
