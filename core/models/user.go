@@ -10,6 +10,8 @@ const (
 type User struct {
 	ID       string
 	Username string
+	Name     string
+	LastName string
 	Password string
 	Email    string
 	Type     UserType
@@ -28,6 +30,8 @@ type CreateUser struct {
 type ModifyUser struct {
 	ID       string
 	Username string
+	Name     string
+	LastName string
 	Password string
 	Email    string
 	Type     UserType
@@ -36,6 +40,8 @@ type ModifyUser struct {
 type UserData struct {
 	ID       string   `json:"id"`
 	Username string   `json:"username"`
+	Name     string   `json:"name"`
+	LastName string   `json:"lastName"`
 	Email    string   `json:"email"`
 	Type     UserType `json:"type"`
 	Picture  string   `json:"picture"`
@@ -51,6 +57,8 @@ func (u *User) ToUserData() *UserData {
 	return &UserData{
 		ID:       u.ID,
 		Username: u.Username,
+		Name:     u.Name,
+		LastName: u.LastName,
 		Email:    u.Email,
 		Type:     u.Type,
 		Picture:  u.Picture,
@@ -71,6 +79,8 @@ func (mu *ModifyUser) ToUser() *User {
 	return &User{
 		ID:       mu.ID,
 		Username: mu.Username,
+		Name:     mu.Name,
+		LastName: mu.LastName,
 		Password: mu.Password,
 		Email:    mu.Email,
 		Type:     mu.Type,
@@ -108,6 +118,12 @@ func (mu *ModifyUser) Validate() *SystemError {
 	}
 	if mu.Type == "" {
 		return NewSystemError(SystemErrorCodeValidation, SystemErrorTypeValidation, SystemErrorLevelError, "type is required", struct{}{})
+	}
+	if mu.Name == "" {
+		return NewSystemError(SystemErrorCodeValidation, SystemErrorTypeValidation, SystemErrorLevelError, "name is required", struct{}{})
+	}
+	if mu.LastName == "" {
+		return NewSystemError(SystemErrorCodeValidation, SystemErrorTypeValidation, SystemErrorLevelError, "last name is required", struct{}{})
 	}
 	return nil
 }

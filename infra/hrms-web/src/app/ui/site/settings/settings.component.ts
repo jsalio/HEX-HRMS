@@ -1,5 +1,6 @@
-import { Component, signal } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ListUserUseCase } from '../../../core/usecases/list';
 
 interface UserMock {
   id: string;
@@ -22,7 +23,18 @@ interface RoleMock {
   templateUrl: './settings.component.html',
   styleUrl: './settings.component.css'
 })
-export class SettingsComponent {
+export class SettingsComponent implements OnInit {
+  /**
+   *
+   */
+  constructor(private list: ListUserUseCase) {}
+
+  ngOnInit(): void {
+    this.list.Execute({key: '', value: ''}).then((data) => {
+      console.log(data);
+    });
+  }
+
   activeTab = signal<'users' | 'roles'>('users');
 
   users = signal<UserMock[]>([

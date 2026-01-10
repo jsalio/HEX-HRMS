@@ -15,6 +15,8 @@ type UserGorm struct {
 	Username  string    `gorm:"type:varchar(255)"`
 	Password  string    `gorm:"type:varchar(255)"`
 	Email     string    `gorm:"type:varchar(255)"`
+	Name      string    `gorm:"type:varchar(255)"`
+	LastName  string    `gorm:"type:varchar(255)"`
 	Type      string    `gorm:"type:varchar(255)"`
 	Picture   string    `gorm:"type:varchar(255)"`
 	Role      string    `gorm:"type:varchar(255)"`
@@ -34,6 +36,8 @@ func ToModel(entity models.User) UserGorm {
 		Username: entity.Username,
 		Password: entity.Password,
 		Email:    entity.Email,
+		Name:     entity.Name,
+		LastName: entity.LastName,
 		Type:     string(entity.Type),
 		Picture:  entity.Picture,
 		Role:     string(entity.Role),
@@ -47,6 +51,8 @@ func ToEntityUser(gorm UserGorm) models.User {
 		Username: gorm.Username,
 		Password: gorm.Password,
 		Email:    gorm.Email,
+		Name:     gorm.Name,
+		LastName: gorm.LastName,
 		Type:     models.UserType(gorm.Type),
 		Picture:  gorm.Picture,
 		Role:     gorm.Role,

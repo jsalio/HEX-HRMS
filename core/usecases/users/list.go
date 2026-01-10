@@ -58,15 +58,13 @@ func NewListUserUseCase(userContract contracts.UserContract, request contracts.I
 // It checks if the request is empty and validates each filter against the User model using reflection.
 func (u *ListUserUseCase) Validate() *models.SystemError {
 	request := u.request.Build()
-	if len(request) == 0 {
-		return models.NewSystemError(models.SystemErrorCodeValidation, models.SystemErrorTypeValidation, models.SystemErrorLevelError, "request is empty", struct{}{})
+	if len(request) > 0 {
+		filters := models.Filters(request)
+		if err := filters.Validate(models.User{}); err != nil {
+			return err
+		}
+		// return models.NewSystemError(models.SystemErrorCodeValidation, models.SystemErrorTypeValidation, models.SystemErrorLevelError, "request is empty", struct{}{})
 	}
-
-	filters := models.Filters(request)
-	if err := filters.Validate(models.User{}); err != nil {
-		return err
-	}
-
 	return nil
 }
 
