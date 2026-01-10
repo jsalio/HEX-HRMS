@@ -22,10 +22,10 @@
         <!-- User Profile Section -->
         <div class="sidebar-footer">
             <div class="user-profile">
-                <div class="user-avatar">{{ currentUser.avatar }}</div>
+                <div class="user-avatar">{{ currentUser()?.username?.substring(0, 2) | uppercase }}</div>
                 <div class="user-info" *ngIf="!isSidebarCollapsed">
-                    <div class="user-name">{{ currentUser.name }}</div>
-                    <div class="user-role">{{ currentUser.role }}</div>
+                    <div class="user-name">{{ currentUser()?.username }}</div>
+                    <div class="user-role">{{ currentUser()?.role || currentUser()?.type }}</div>
                 </div>
             </div>
         </div>
@@ -52,8 +52,8 @@
                 <!-- User Menu -->
                 <div class="user-menu">
                     <button class="user-menu-btn">
-                        <div class="user-avatar-small">{{ currentUser.avatar }}</div>
-                        <span class="user-name-header">{{ currentUser.name }}</span>
+                        <div class="user-avatar-small">{{ currentUser()?.username?.substring(0, 2) | uppercase }}</div>
+                        <span class="user-name-header">{{ currentUser()?.username }}</span>
                         <span class="dropdown-arrow">▼</span>
                     </button>
                     <div class="user-dropdown">

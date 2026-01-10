@@ -1,9 +1,10 @@
 package repo
 
 import (
+	"time"
+
 	"hrms.local/core/contracts"
 	"hrms.local/core/models"
-	"time"
 
 	"github.com/google/uuid"
 	"gorm.io/gorm"
@@ -15,6 +16,8 @@ type UserGorm struct {
 	Password  string    `gorm:"type:varchar(255)"`
 	Email     string    `gorm:"type:varchar(255)"`
 	Type      string    `gorm:"type:varchar(255)"`
+	Picture   string    `gorm:"type:varchar(255)"`
+	Role      string    `gorm:"type:varchar(255)"`
 	CreatedAt time.Time
 	UpdatedAt time.Time
 	DeletedAt gorm.DeletedAt `gorm:"index"`
@@ -32,6 +35,8 @@ func ToModel(entity models.User) UserGorm {
 		Password: entity.Password,
 		Email:    entity.Email,
 		Type:     string(entity.Type),
+		Picture:  entity.Picture,
+		Role:     string(entity.Role),
 		Active:   entity.Active,
 	}
 }
@@ -43,6 +48,8 @@ func ToEntityUser(gorm UserGorm) models.User {
 		Password: gorm.Password,
 		Email:    gorm.Email,
 		Type:     models.UserType(gorm.Type),
+		Picture:  gorm.Picture,
+		Role:     gorm.Role,
 		Active:   gorm.Active,
 	}
 }

@@ -14,6 +14,8 @@ type User struct {
 	Email    string
 	Type     UserType
 	Active   bool
+	Picture  string
+	Role     string
 }
 
 type CreateUser struct {
@@ -32,10 +34,12 @@ type ModifyUser struct {
 }
 
 type UserData struct {
-	ID       string
-	Username string
-	Email    string
-	Type     UserType
+	ID       string   `json:"id"`
+	Username string   `json:"username"`
+	Email    string   `json:"email"`
+	Type     UserType `json:"type"`
+	Picture  string   `json:"picture"`
+	Role     string   `json:"role"`
 }
 
 type LoginUser struct {
@@ -49,6 +53,8 @@ func (u *User) ToUserData() *UserData {
 		Username: u.Username,
 		Email:    u.Email,
 		Type:     u.Type,
+		Picture:  u.Picture,
+		Role:     u.Role,
 	}
 }
 
