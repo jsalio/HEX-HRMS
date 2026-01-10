@@ -2,8 +2,10 @@ package repo
 
 import (
 	"context"
-	"hrms.local/core/models"
+	"fmt"
 	"sync"
+
+	"hrms.local/core/models"
 
 	"gorm.io/gorm"
 )
@@ -48,6 +50,7 @@ func (g *GenericCrud[T, G]) GetByFilter(filters ...models.Filter) ([]T, *models.
 	var gormModels []G
 	query := g.db.WithContext(g.currentContext())
 	for _, filter := range filters {
+		fmt.Println(filter.Key, filter.Value)
 		query = query.Where(filter.Key+" = ?", filter.Value)
 	}
 	if err := query.Find(&gormModels).Error; err != nil {

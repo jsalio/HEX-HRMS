@@ -27,6 +27,7 @@ export class AuthService {
   }
 
   private getStoredAuth(): UserData | null {
+    debugger
     const stored = localStorage.getItem(this.AUTH_KEY);
     if (!stored) return null;
     try {

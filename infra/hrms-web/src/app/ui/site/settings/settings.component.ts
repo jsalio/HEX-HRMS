@@ -1,14 +1,7 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ListUserUseCase } from '../../../core/usecases/list';
-
-interface UserMock {
-  id: string;
-  name: string;
-  email: string;
-  role: string;
-  status: 'active' | 'inactive';
-}
+import { UserData } from '../../../core/domain/models';
 
 interface RoleMock {
   id: string;
@@ -24,44 +17,45 @@ interface RoleMock {
   styleUrl: './settings.component.css'
 })
 export class SettingsComponent implements OnInit {
-  /**
-   *
-   */
-  constructor(private list: ListUserUseCase) {}
-
-  ngOnInit(): void {
-    this.list.Execute({key: '', value: ''}).then((data) => {
-      console.log(data);
-    });
-  }
+  private list = inject(ListUserUseCase);
 
   activeTab = signal<'users' | 'roles'>('users');
-
-  users = signal<UserMock[]>([
-    { id: '1', name: 'Admin User', email: 'admin@hex.com', role: 'Administrator', status: 'active' },
-    { id: '2', name: 'Jorge Salio', email: 'jorge@hex.com', role: 'Developer', status: 'active' },
-    { id: '3', name: 'Demo User', email: 'demo@hex.com', role: 'Manager', status: 'inactive' },
-  ]);
-
+  users = signal<UserData[]>([]);
   roles = signal<RoleMock[]>([
     { id: '1', name: 'Administrator', permissions: ['all_access', 'manage_users', 'manage_roles'] },
     { id: '2', name: 'Manager', permissions: ['view_reports', 'manage_employees'] },
     { id: '3', name: 'Developer', permissions: ['view_dashboard', 'manage_code'] },
   ]);
 
+  ngOnInit(): void {
+    this.fetchUsers();
+  }
+
+  fetchUsers(): void {
+    this.list.Execute({ key: '', value: '' }).then((data) => {
+      this.users.set(data);
+    }).catch(err => {
+      console.error('Error fetching users:', err);
+    });
+  }
+
   setTab(tab: 'users' | 'roles') {
     this.activeTab.set(tab);
   }
 
+  getInitials(user: UserData): string {
+    if (!user.name || !user.lastName) return '??';
+    return (user.name[0] + user.lastName[0]).toUpperCase();
+  }
+
   deleteUser(id: string) {
     console.log('Delete user', id);
+    // TODO: Implement real delete
     this.users.update(users => users.filter(u => u.id !== id));
   }
 
   toggleStatus(id: string) {
     console.log('Toggle status', id);
-    this.users.update(users => users.map(u => 
-      u.id === id ? { ...u, status: u.status === 'active' ? 'inactive' : 'active' } : u
-    ));
+    // TODO: Implement real status toggle
   }
 }

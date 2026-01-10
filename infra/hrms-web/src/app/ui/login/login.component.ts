@@ -30,6 +30,7 @@ export class LoginComponent {
     this.isSubmitting.set(true);
     this.loginUseCase.Execute(user)
       .then((userData) => {
+        debugger
         this.isSubmitting.set(false);
         this.authService.setAuth(userData);
         console.log('Login successful!');

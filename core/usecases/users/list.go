@@ -70,15 +70,25 @@ func (u *ListUserUseCase) Validate() *models.SystemError {
 
 // Execute performs the user retrieval operation.
 // It builds the filters from the request and passes them to the user contract to fetch the data.
-func (u *ListUserUseCase) Execute() ([]*models.User, *models.SystemError) {
+func (u *ListUserUseCase) Execute() ([]*models.UserData, *models.SystemError) {
 	filters := u.request.Build()
 	data, err := u.userContract.GetByFilter(filters...)
 	if err != nil {
 		return nil, err
 	}
-	var result []*models.User
+	var result []*models.UserData
 	for i := range data {
-		result = append(result, &data[i])
+		result = append(result, &models.UserData{
+			Id:       data[i].ID,
+			Username: data[i].Username,
+			Name:     data[i].Name,
+			LastName: data[i].LastName,
+			Email:    data[i].Email,
+			Type:     data[i].Type,
+			Picture:  data[i].Picture,
+			Role:     data[i].Role,
+			Active:   data[i].Active,
+		})
 	}
 	return result, nil
 }

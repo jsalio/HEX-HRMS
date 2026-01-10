@@ -38,7 +38,7 @@ type ModifyUser struct {
 }
 
 type UserData struct {
-	ID       string   `json:"id"`
+	Id       string   `json:"id"`
 	Username string   `json:"username"`
 	Name     string   `json:"name"`
 	LastName string   `json:"lastName"`
@@ -46,6 +46,7 @@ type UserData struct {
 	Type     UserType `json:"type"`
 	Picture  string   `json:"picture"`
 	Role     string   `json:"role"`
+	Active   bool     `json:"active"`
 }
 
 type LoginUser struct {
@@ -55,7 +56,7 @@ type LoginUser struct {
 
 func (u *User) ToUserData() *UserData {
 	return &UserData{
-		ID:       u.ID,
+		Id:       u.ID,
 		Username: u.Username,
 		Name:     u.Name,
 		LastName: u.LastName,
