@@ -32,6 +32,9 @@ export interface UserData {
   username: string;
   email: string;
   type: UserType;
+  token: string;
+  picture?: string;
+  role?: string;
 }
 
 export interface LoginUser {

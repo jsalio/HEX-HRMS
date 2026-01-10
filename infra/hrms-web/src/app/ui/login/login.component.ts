@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { LoginFormComponent } from './components/login-form/login-form.component';
 import { LoginUser } from '../../core/domain/models';
 import { LoginUserUseCase } from '../../core/usecases/login';
+import { AuthService } from '../../infrastructure/auth/auth.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-login',
@@ -18,15 +20,20 @@ import { LoginUserUseCase } from '../../core/usecases/login';
 export class LoginComponent {
   isSubmitting = signal<boolean>(false);
 
-  constructor(private loginUseCase: LoginUserUseCase) {}
+  constructor(
+    private loginUseCase: LoginUserUseCase,
+    private authService: AuthService,
+    private router: Router
+  ) {}
 
   onLogin(user: LoginUser): void {
     this.isSubmitting.set(true);
     this.loginUseCase.Execute(user)
-      .then(() => {
+      .then((userData) => {
         this.isSubmitting.set(false);
+        this.authService.setAuth(userData);
         console.log('Login successful!');
-        // Redirección aquí
+        this.router.navigate(['/dashboard']);
       })
       .catch(() => {
         this.isSubmitting.set(false);
