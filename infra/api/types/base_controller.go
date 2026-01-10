@@ -1,8 +1,9 @@
 package types
 
 import (
-	"hrms.local/core/models"
 	"net/http"
+
+	"hrms.local/core/models"
 
 	"github.com/gin-gonic/gin"
 )

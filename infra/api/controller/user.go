@@ -92,7 +92,15 @@ func (uc *UserController) LoginUser(c *gin.Context) {
 		c.Abort()
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"message": "Login successful", "token": tokenData})
+	response := gin.H{
+		"username": data.Username,
+		"type":     data.Type,
+		"email":    data.Email,
+		"picture":  "",
+		"role":     "",
+		"token":    tokenData,
+	}
+	c.JSON(http.StatusOK, response)
 }
 
 func (uc *UserController) LogoutUser(c *gin.Context) {

@@ -1,1 +1,74 @@
-<p>layout works!</p>
+<div class="layout-container">
+    <!-- Sidebar -->
+    <aside class="sidebar" [class.collapsed]="isSidebarCollapsed">
+        <!-- Logo Section -->
+        <div class="sidebar-header">
+            <div class="logo-container">
+                <div class="logo-icon">🏢</div>
+                <span class="logo-text" *ngIf="!isSidebarCollapsed">HEX HRMS</span>
+            </div>
+        </div>
+
+        <!-- Navigation Menu -->
+        <nav class="sidebar-nav">
+            <a *ngFor="let item of menuItems" [routerLink]="item.route" routerLinkActive="active" class="nav-item"
+                [title]="isSidebarCollapsed ? item.label : ''">
+                <span class="nav-icon">{{ item.icon }}</span>
+                <span class="nav-label" *ngIf="!isSidebarCollapsed">{{ item.label }}</span>
+                <span class="nav-badge" *ngIf="item.badge && !isSidebarCollapsed">{{ item.badge }}</span>
+            </a>
+        </nav>
+
+        <!-- User Profile Section -->
+        <div class="sidebar-footer">
+            <div class="user-profile">
+                <div class="user-avatar">{{ currentUser.avatar }}</div>
+                <div class="user-info" *ngIf="!isSidebarCollapsed">
+                    <div class="user-name">{{ currentUser.name }}</div>
+                    <div class="user-role">{{ currentUser.role }}</div>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <div class="main-content">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-left">
+                <button class="toggle-btn" (click)="toggleSidebar()" aria-label="Toggle sidebar">
+                    <span class="hamburger-icon">☰</span>
+                </button>
+                <h1 class="page-title">Human Resources Management System</h1>
+            </div>
+
+            <div class="header-right">
+                <!-- Notifications -->
+                <button class="icon-btn" aria-label="Notifications">
+                    <span class="notification-icon">🔔</span>
+                    <span class="notification-badge">5</span>
+                </button>
+
+                <!-- User Menu -->
+                <div class="user-menu">
+                    <button class="user-menu-btn">
+                        <div class="user-avatar-small">{{ currentUser.avatar }}</div>
+                        <span class="user-name-header">{{ currentUser.name }}</span>
+                        <span class="dropdown-arrow">▼</span>
+                    </button>
+                    <div class="user-dropdown">
+                        <a href="#" class="dropdown-item">👤 Profile</a>
+                        <a href="#" class="dropdown-item">⚙️ Settings</a>
+                        <hr class="dropdown-divider">
+                        <a href="#" class="dropdown-item" (click)="logout()">🚪 Logout</a>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Page Content -->
+        <main class="content">
+            <router-outlet></router-outlet>
+        </main>
+    </div>
+</div>

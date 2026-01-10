@@ -7,9 +7,10 @@ export class LoginUserUseCase {
     /**
      *
      */
-constructor(@Inject(USER_REPOSITORY) private userRepo: UserRepository) {}
+    constructor(@Inject(USER_REPOSITORY) private userRepo: UserRepository) {}
+    
     async Execute(loginUser:LoginUser): Promise<UserData> {
         const data = await this.userRepo.login(loginUser);
         return data
     }
-}0
+}
