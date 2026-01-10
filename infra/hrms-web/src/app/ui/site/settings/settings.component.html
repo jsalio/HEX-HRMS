@@ -1,0 +1,123 @@
+<div class="settings-container animate-fade-in p-6 max-w-7xl mx-auto">
+    <!-- Header -->
+    <div class="flex justify-between items-end mb-8">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-800">Settings</h1>
+            <p class="text-gray-500 mt-1">Manage system users, roles and configurations</p>
+        </div>
+        <div class="flex space-x-2 bg-gray-100 p-1 rounded-xl shadow-inner">
+            <button (click)="setTab('users')" [class.bg-white]="activeTab() === 'users'"
+                [class.text-primary-600]="activeTab() === 'users'" [class.shadow-sm]="activeTab() === 'users'"
+                class="px-6 py-2 rounded-lg text-sm font-semibold transition-all duration-200 hover:text-primary-500">
+                Users
+            </button>
+            <button (click)="setTab('roles')" [class.bg-white]="activeTab() === 'roles'"
+                [class.text-primary-600]="activeTab() === 'roles'" [class.shadow-sm]="activeTab() === 'roles'"
+                class="px-6 py-2 rounded-lg text-sm font-semibold transition-all duration-200 hover:text-primary-500">
+                Roles
+            </button>
+        </div>
+    </div>
+
+    <!-- Content Card -->
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden min-h-[500px]">
+
+        <!-- Users Tab -->
+        <div *ngIf="activeTab() === 'users'" class="animate-slide-in">
+            <div class="p-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
+                <h2 class="font-bold text-gray-700">User Management</h2>
+                <button
+                    class="bg-primary-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-primary-700 transition-colors shadow-sm">
+                    + Add New User
+                </button>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-left">
+                    <thead class="bg-gray-50/50 text-gray-500 text-xs font-semibold uppercase tracking-wider">
+                        <tr>
+                            <th class="px-6 py-4">User</th>
+                            <th class="px-6 py-4">Status</th>
+                            <th class="px-6 py-4">Role</th>
+                            <th class="px-6 py-4 text-right">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100">
+                        <tr *ngFor="let user of users()" class="hover:bg-gray-50/80 transition-colors group">
+                            <td class="px-6 py-4">
+                                <div class="flex items-center">
+                                    <div
+                                        class="h-10 w-10 rounded-full bg-gradient-to-br from-primary-400 to-secondary-400 flex items-center justify-center text-white font-bold text-sm shadow-sm">
+                                        {{ user.name.substring(0, 2) | uppercase }}
+                                    </div>
+                                    <div class="ml-4">
+                                        <div class="text-sm font-bold text-gray-800">{{ user.name }}</div>
+                                        <div class="text-xs text-gray-500">{{ user.email }}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4">
+                                <span [class.bg-green-100]="user.status === 'active'"
+                                    [class.text-green-700]="user.status === 'active'"
+                                    [class.bg-gray-100]="user.status === 'inactive'"
+                                    [class.text-gray-600]="user.status === 'inactive'"
+                                    class="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider">
+                                    {{ user.status }}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 text-sm text-gray-600">
+                                {{ user.role }}
+                            </td>
+                            <td class="px-6 py-4 text-right space-x-3">
+                                <button (click)="toggleStatus(user.id)"
+                                    class="text-gray-400 hover:text-secondary-600 transition-colors"
+                                    title="Toggle Access">
+                                    <span *ngIf="user.status === 'active'">🔒</span>
+                                    <span *ngIf="user.status === 'inactive'">🔓</span>
+                                </button>
+                                <button class="text-gray-400 hover:text-blue-600 transition-colors"
+                                    title="Edit">✏️</button>
+                                <button (click)="deleteUser(user.id)"
+                                    class="text-gray-400 hover:text-red-600 transition-colors"
+                                    title="Delete">🗑️</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Roles Tab -->
+        <div *ngIf="activeTab() === 'roles'" class="p-8 animate-slide-in">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="font-bold text-gray-700 text-lg">System Roles</h2>
+                <button class="text-primary-600 text-sm font-semibold hover:underline">+ Define New Role</button>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div *ngFor="let role of roles()"
+                    class="p-6 rounded-2xl border border-gray-100 bg-gray-50/30 hover:shadow-md transition-all group">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="p-3 bg-white rounded-xl shadow-sm group-hover:bg-primary-50 transition-colors">
+                            <span class="text-2xl">🛡️</span>
+                        </div>
+                        <button class="text-gray-400 hover:text-gray-600">•••</button>
+                    </div>
+                    <h3 class="font-bold text-gray-800 text-lg">{{ role.name }}</h3>
+                    <p class="text-xs text-gray-500 mb-4">{{ role.permissions.length }} permissions assigned</p>
+
+                    <div class="flex flex-wrap gap-2">
+                        <span *ngFor="let perm of role.permissions.slice(0, 2)"
+                            class="px-2 py-1 bg-white border border-gray-200 rounded text-[10px] text-gray-600 font-medium">
+                            {{ perm }}
+                        </span>
+                        <span *ngIf="role.permissions.length > 2"
+                            class="px-2 py-1 bg-gray-100 rounded text-[10px] text-gray-500 font-medium">
+                            +{{ role.permissions.length - 2 }} more
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

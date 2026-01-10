@@ -48,7 +48,7 @@ export const routes: Routes = [
       },
       {
         path: 'settings',
-        loadComponent: () => import('./ui/site/home/home.component').then(m => m.HomeComponent) // TODO: Create SettingsComponent
+        loadComponent: () => import('./ui/site/settings/settings.component').then(m => m.SettingsComponent)
       },
       {
         path: '',
