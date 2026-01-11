@@ -2,6 +2,7 @@ import { Component, OnInit, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ListUserUseCase } from '../../../core/usecases/list';
 import { UserData } from '../../../core/domain/models';
+import { UserListComponent } from './components/user-list/user-list.component';
 
 interface RoleMock {
   id: string;
@@ -12,7 +13,7 @@ interface RoleMock {
 @Component({
   selector: 'app-settings',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, UserListComponent],
   templateUrl: './settings.component.html',
   styleUrl: './settings.component.css'
 })
@@ -55,11 +56,6 @@ export class SettingsComponent implements OnInit {
 
   setTab(tab: 'users' | 'roles') {
     this.activeTab.set(tab);
-  }
-
-  getInitials(user: UserData): string {
-    if (!user.name || !user.lastName) return '??';
-    return (user.name[0] + user.lastName[0]).toUpperCase();
   }
 
   deleteUser(id: string) {
