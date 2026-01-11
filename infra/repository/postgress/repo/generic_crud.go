@@ -46,14 +46,17 @@ func (g *GenericCrud[T, G]) currentContext() context.Context {
 	return g.ctx
 }
 
-func (g *GenericCrud[T, G]) GetByFilter(filters ...models.Filter) ([]T, *models.SystemError) {
+func (g *GenericCrud[T, G]) GetByFilter(query models.SearchQuery) ([]T, *models.SystemError) {
 	var gormModels []G
-	query := g.db.WithContext(g.currentContext())
-	for _, filter := range filters {
+	dbQuery := g.db.WithContext(g.currentContext())
+	for _, filter := range query.Filters {
 		fmt.Println(filter.Key, filter.Value)
-		query = query.Where(filter.Key+" = ?", filter.Value)
+		dbQuery = dbQuery.Where(filter.Key+" = ?", filter.Value)
 	}
-	if err := query.Find(&gormModels).Error; err != nil {
+
+	dbQuery = dbQuery.Limit(query.Pagination.GetLimit()).Offset(query.Pagination.GetOffset())
+
+	if err := dbQuery.Find(&gormModels).Error; err != nil {
 		return nil, models.NewSystemError(models.SystemErrorCodeValidation, models.SystemErrorTypeValidation, models.SystemErrorLevelError, "Query failed", struct{}{})
 	}
 

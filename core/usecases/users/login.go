@@ -24,14 +24,18 @@ func (u *LoginUserUseCase) Validate() *models.SystemError {
 	if request.Username == "" || request.Password == "" {
 		return models.NewSystemError(models.SystemErrorCodeValidation, models.SystemErrorTypeValidation, models.SystemErrorLevelError, "request is empty", struct{}{})
 	}
-	user, err := u.userContract.GetByFilter(models.Filter{
-		Key:   "username",
-		Value: request.Username,
+	user, err := u.userContract.GetByFilter(models.SearchQuery{
+		Filters: models.Filters{
+			{
+				Key:   "Username",
+				Value: request.Username,
+			},
+		},
 	})
 	if err != nil {
 		return err
 	}
-	if user == nil {
+	if len(user) == 0 {
 		return models.NewSystemError(models.SystemErrorCodeInternal, models.SystemErrorTypeValidation, models.SystemErrorLevelError, "El usuario no existe", struct{}{})
 	}
 
@@ -49,9 +53,13 @@ func (u *LoginUserUseCase) Validate() *models.SystemError {
 
 func (u *LoginUserUseCase) Execute() (*models.UserData, *models.SystemError) {
 	request := u.request.Build()
-	user, err := u.userContract.GetByFilter(models.Filter{
-		Key:   "username",
-		Value: request.Username,
+	user, err := u.userContract.GetByFilter(models.SearchQuery{
+		Filters: models.Filters{
+			{
+				Key:   "Username",
+				Value: request.Username,
+			},
+		},
 	})
 	if err != nil {
 		return nil, err

@@ -1,6 +1,10 @@
 package postgress
 
 import (
+	"strconv"
+	"time"
+
+	"github.com/google/uuid"
 	"hrms.local/core/contracts"
 	"hrms.local/core/models"
 	"hrms.local/repository/postgress/repo"
@@ -54,5 +58,60 @@ func migrate(db *gorm.DB) models.SystemError {
 			Message: "Failed to migrate database",
 		}
 	}
+	if err := defaultUsers(db); err.Code != models.SystemErrorCodeNone {
+		return err
+	}
 	return models.SystemError{}
+}
+
+func defaultUsers(db *gorm.DB) models.SystemError {
+	var gormModels []repo.UserGorm
+	for i := range 100 {
+		user := repo.UserGorm{
+			ID:        uuid.New(),
+			Username:  "user" + strconv.Itoa(i) + "@mail.com",
+			Password:  "$2a$10$GjJPDCWa8Ig.7JC73mx6HuQ7yfsUblT5do8m3we9fUI3j34yaFlJ.", // password
+			Name:      "User " + strconv.Itoa(i),
+			Email:     "user" + strconv.Itoa(i) + "@mail.com",
+			LastName:  "LastName " + strconv.Itoa(i),
+			Picture:   "",
+			Type:      "user",
+			CreatedAt: time.Now(),
+			UpdatedAt: time.Now(),
+			// DeletedAt: nil,
+			Active: false,
+			Role:   "user",
+		}
+		query := db.Where("email = ?", user.Email)
+		query.Find(&gormModels)
+		if len(gormModels) > 0 {
+			continue
+		}
+		if err := query.Create(&user).Error; err != nil {
+			return models.SystemError{
+				Code:    models.SystemErrorCodeMigration,
+				Type:    models.SystemErrorTypeValidation,
+				Level:   models.SystemErrorLevelError,
+				Message: "Failed to create default user",
+			}
+		}
+	}
+
+	return models.SystemError{}
+
+	// user := repo.UserGorm{
+	// 	ID:       uuid.New(),
+	// 	Username: "admin",
+	// 	Password: "admin",
+	// 	Role:     "admin",
+	// }
+	// if err := db.Create(&user).Error; err != nil {
+	// 	return models.SystemError{
+	// 		Code:    models.SystemErrorCodeMigration,
+	// 		Type:    models.SystemErrorTypeValidation,
+	// 		Level:   models.SystemErrorLevelError,
+	// 		Message: "Failed to create default user",
+	// 	}
+	// }
+	// return models.SystemError{}
 }

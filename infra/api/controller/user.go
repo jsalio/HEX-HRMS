@@ -112,8 +112,26 @@ func (uc *UserController) Me(c *gin.Context) {
 }
 
 func (uc *UserController) ListUsers(c *gin.Context) {
-	filters := models.Filters{}
-	request := contracts.NewGenericRequest(filters)
+	uc.SetContext(c)
+	var body models.SearchQuery
+
+	if c.Request.ContentLength > 0 {
+		if _, err := uc.BaseController.GetBody(c, &body); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Message})
+			c.Abort()
+			return
+		}
+	} else {
+		body = models.SearchQuery{
+			Filters: models.Filters{},
+			Pagination: models.Pagination{
+				Page:  1,
+				Limit: 10,
+			},
+		}
+	}
+
+	request := contracts.NewGenericRequest(body)
 	users := userUseCase.NewListUserUseCase(uc.userContract, request)
 	if err := users.Validate(); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Message})
@@ -142,7 +160,7 @@ func (uc *UserController) RegisterRoutes(router *gin.RouterGroup) {
 	private.Use(uc.authMiddleware.AuthMiddleware())
 	{
 		private.GET("/me", uc.Me)
-		private.GET("/list", uc.ListUsers)
+		private.POST("/list", uc.ListUsers)
 
 	}
 	//return router

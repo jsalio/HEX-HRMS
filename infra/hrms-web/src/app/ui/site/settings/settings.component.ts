@@ -32,7 +32,10 @@ export class SettingsComponent implements OnInit {
   }
 
   fetchUsers(): void {
-    this.list.Execute({ key: '', value: '' }).then((data) => {
+    this.list.Execute({ 
+      filters: [], 
+      pagination: { page: 1, limit: 10 } 
+    }).then((data) => {
       this.users.set(data);
     }).catch(err => {
       console.error('Error fetching users:', err);

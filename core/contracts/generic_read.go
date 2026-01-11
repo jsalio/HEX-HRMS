@@ -11,5 +11,5 @@ type ReadOperation[T any] interface {
 	// 			return nil, err
 	// 		}
 	// 		return data, nil
-	GetByFilter(filters ...models.Filter) ([]T, *models.SystemError)
+	GetByFilter(query models.SearchQuery) ([]T, *models.SystemError)
 }

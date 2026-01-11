@@ -42,12 +42,12 @@ import (
 //	}
 type ListUserUseCase struct {
 	userContract contracts.UserContract
-	request      contracts.IGenericRequest[models.Filters]
+	request      contracts.IGenericRequest[models.SearchQuery]
 }
 
 // NewListUserUseCase creates a new instance of ListUserUseCase.
 // It injects the user contract (dependency inversion) and the request data.
-func NewListUserUseCase(userContract contracts.UserContract, request contracts.IGenericRequest[models.Filters]) *ListUserUseCase {
+func NewListUserUseCase(userContract contracts.UserContract, request contracts.IGenericRequest[models.SearchQuery]) *ListUserUseCase {
 	return &ListUserUseCase{
 		userContract: userContract,
 		request:      request,
@@ -58,12 +58,8 @@ func NewListUserUseCase(userContract contracts.UserContract, request contracts.I
 // It checks if the request is empty and validates each filter against the User model using reflection.
 func (u *ListUserUseCase) Validate() *models.SystemError {
 	request := u.request.Build()
-	if len(request) > 0 {
-		filters := models.Filters(request)
-		if err := filters.Validate(models.User{}); err != nil {
-			return err
-		}
-		// return models.NewSystemError(models.SystemErrorCodeValidation, models.SystemErrorTypeValidation, models.SystemErrorLevelError, "request is empty", struct{}{})
+	if err := request.Filters.Validate(models.User{}); err != nil {
+		return err
 	}
 	return nil
 }
@@ -71,8 +67,8 @@ func (u *ListUserUseCase) Validate() *models.SystemError {
 // Execute performs the user retrieval operation.
 // It builds the filters from the request and passes them to the user contract to fetch the data.
 func (u *ListUserUseCase) Execute() ([]*models.UserData, *models.SystemError) {
-	filters := u.request.Build()
-	data, err := u.userContract.GetByFilter(filters...)
+	query := u.request.Build()
+	data, err := u.userContract.GetByFilter(query)
 	if err != nil {
 		return nil, err
 	}
