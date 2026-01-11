@@ -21,6 +21,9 @@ export class SettingsComponent implements OnInit {
 
   activeTab = signal<'users' | 'roles'>('users');
   users = signal<UserData[]>([]);
+  currentPage = signal<number>(1);
+  totalPages = signal<number>(1);
+  pageSize = signal<number>(5);
   roles = signal<RoleMock[]>([
     { id: '1', name: 'Administrator', permissions: ['all_access', 'manage_users', 'manage_roles'] },
     { id: '2', name: 'Manager', permissions: ['view_reports', 'manage_employees'] },
@@ -31,15 +34,23 @@ export class SettingsComponent implements OnInit {
     this.fetchUsers();
   }
 
-  fetchUsers(): void {
+  fetchUsers(page: number = 1): void {
     this.list.Execute({ 
       filters: [], 
-      pagination: { page: 1, limit: 10 } 
+      pagination: { page: page, limit: this.pageSize() } 
     }).then((data) => {
-      this.users.set(data);
+      this.users.set(data.rows);
+      this.totalPages.set(data.total_pages);
+      this.currentPage.set(page);
     }).catch(err => {
       console.error('Error fetching users:', err);
     });
+  }
+
+  changePage(page: number): void {
+    if (page >= 1 && page <= this.totalPages()) {
+        this.fetchUsers(page);
+    }
   }
 
   setTab(tab: 'users' | 'roles') {

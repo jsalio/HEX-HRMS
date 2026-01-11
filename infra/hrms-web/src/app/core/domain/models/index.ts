@@ -1,5 +1,6 @@
 // User models
 export * from './user.model';
+export * from './pagination.model';
 
 // Department models
 export * from './department.model';

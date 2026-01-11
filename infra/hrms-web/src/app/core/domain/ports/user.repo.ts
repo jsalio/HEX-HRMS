@@ -1,5 +1,5 @@
 import { InjectionToken } from "@angular/core";
-import { CreateUser, Filter, LoginUser, ModifyUser, SearchQuery, User, UserData } from "../models";
+import { CreateUser, Filter, LoginUser, ModifyUser, PaginatedResponse, SearchQuery, User, UserData } from "../models";
 
 export const USER_REPOSITORY = new InjectionToken<UserRepository>('USER_REPOSITORY');
 
@@ -11,5 +11,5 @@ export interface UserRepository {
     // updateUser(id: string, user: ModifyUser): Promise<User>;
     // deleteUser(id: string): Promise<void>;
     login(loginUser:LoginUser):Promise<UserData>
-    list(query: SearchQuery):Promise<UserData[]>
+    list(query: SearchQuery):Promise<PaginatedResponse<UserData>>
 }
