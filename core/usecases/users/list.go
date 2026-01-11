@@ -66,25 +66,31 @@ func (u *ListUserUseCase) Validate() *models.SystemError {
 
 // Execute performs the user retrieval operation.
 // It builds the filters from the request and passes them to the user contract to fetch the data.
-func (u *ListUserUseCase) Execute() ([]*models.UserData, *models.SystemError) {
+func (u *ListUserUseCase) Execute() (*models.PaginatedResponse[*models.UserData], *models.SystemError) {
 	query := u.request.Build()
-	data, err := u.userContract.GetByFilter(query)
+	paginatedData, err := u.userContract.GetByFilter(query)
 	if err != nil {
 		return nil, err
 	}
+
 	var result []*models.UserData
-	for i := range data {
+	for i := range paginatedData.Rows {
 		result = append(result, &models.UserData{
-			Id:       data[i].ID,
-			Username: data[i].Username,
-			Name:     data[i].Name,
-			LastName: data[i].LastName,
-			Email:    data[i].Email,
-			Type:     data[i].Type,
-			Picture:  data[i].Picture,
-			Role:     data[i].Role,
-			Active:   data[i].Active,
+			Id:       paginatedData.Rows[i].ID,
+			Username: paginatedData.Rows[i].Username,
+			Name:     paginatedData.Rows[i].Name,
+			LastName: paginatedData.Rows[i].LastName,
+			Email:    paginatedData.Rows[i].Email,
+			Type:     paginatedData.Rows[i].Type,
+			Picture:  paginatedData.Rows[i].Picture,
+			Role:     paginatedData.Rows[i].Role,
+			Active:   paginatedData.Rows[i].Active,
 		})
 	}
-	return result, nil
+
+	return &models.PaginatedResponse[*models.UserData]{
+		TotalRows:  paginatedData.TotalRows,
+		TotalPages: paginatedData.TotalPages,
+		Rows:       result,
+	}, nil
 }

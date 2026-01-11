@@ -112,3 +112,9 @@ func (sq *SearchQuery) Validate(structure any) *SystemError {
 	}
 	return nil
 }
+
+type PaginatedResponse[T any] struct {
+	TotalRows  int64 `json:"total_rows"`
+	TotalPages int   `json:"total_pages"`
+	Rows       []T   `json:"rows"`
+}

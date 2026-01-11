@@ -2,7 +2,6 @@ package repo
 
 import (
 	"context"
-	"fmt"
 	"sync"
 
 	"hrms.local/core/models"
@@ -46,15 +45,20 @@ func (g *GenericCrud[T, G]) currentContext() context.Context {
 	return g.ctx
 }
 
-func (g *GenericCrud[T, G]) GetByFilter(query models.SearchQuery) ([]T, *models.SystemError) {
+func (g *GenericCrud[T, G]) GetByFilter(query models.SearchQuery) (*models.PaginatedResponse[T], *models.SystemError) {
+	totalRows, sysErr := g.CountByFilter(query)
+	if sysErr != nil {
+		return nil, sysErr
+	}
+
 	var gormModels []G
 	dbQuery := g.db.WithContext(g.currentContext())
 	for _, filter := range query.Filters {
-		fmt.Println(filter.Key, filter.Value)
 		dbQuery = dbQuery.Where(filter.Key+" = ?", filter.Value)
 	}
 
-	dbQuery = dbQuery.Limit(query.Pagination.GetLimit()).Offset(query.Pagination.GetOffset())
+	limit := query.Pagination.GetLimit()
+	dbQuery = dbQuery.Limit(limit).Offset(query.Pagination.GetOffset())
 
 	if err := dbQuery.Find(&gormModels).Error; err != nil {
 		return nil, models.NewSystemError(models.SystemErrorCodeValidation, models.SystemErrorTypeValidation, models.SystemErrorLevelError, "Query failed", struct{}{})
@@ -64,7 +68,32 @@ func (g *GenericCrud[T, G]) GetByFilter(query models.SearchQuery) ([]T, *models.
 	for _, gm := range gormModels {
 		entities = append(entities, g.ToEntity(gm))
 	}
-	return entities, nil
+
+	totalPages := 0
+	if limit > 0 {
+		totalPages = int((totalRows + int64(limit) - 1) / int64(limit))
+	}
+
+	return &models.PaginatedResponse[T]{
+		TotalRows:  totalRows,
+		TotalPages: totalPages,
+		Rows:       entities,
+	}, nil
+}
+
+func (g *GenericCrud[T, G]) CountByFilter(query models.SearchQuery) (int64, *models.SystemError) {
+	var count int64
+	var gormModel G
+	dbQuery := g.db.WithContext(g.currentContext()).Model(&gormModel)
+	for _, filter := range query.Filters {
+		dbQuery = dbQuery.Where(filter.Key+" = ?", filter.Value)
+	}
+
+	if err := dbQuery.Count(&count).Error; err != nil {
+		return 0, models.NewSystemError(models.SystemErrorCodeValidation, models.SystemErrorTypeValidation, models.SystemErrorLevelError, "Count failed", struct{}{})
+	}
+
+	return count, nil
 }
 
 func (g *GenericCrud[T, G]) Create(item T) (T, *models.SystemError) {
