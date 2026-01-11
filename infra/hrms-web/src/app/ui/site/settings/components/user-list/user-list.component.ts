@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, output, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { UserData } from '../../../../../core/domain/models';
@@ -18,6 +18,7 @@ export class UserListComponent {
   @Output() pageChange = new EventEmitter<number>();
   @Output() delete = new EventEmitter<string>();
   @Output() toggleStatus = new EventEmitter<string>();
+  edit= output<string>(); 
 
   getInitials(user: UserData): string {
     if (!user.name || !user.lastName) return '??';
@@ -36,5 +37,9 @@ export class UserListComponent {
 
   onToggleStatus(id: string): void {
     this.toggleStatus.emit(id);
+  }
+
+  onEdit(id: string): void {
+    this.edit.emit(id);
   }
 }

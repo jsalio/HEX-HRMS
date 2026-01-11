@@ -48,7 +48,8 @@
                             class="text-gray-400 hover:text-secondary-600 transition-colors" title="Toggle Access">
                             <span>🔒</span>
                         </button>
-                        <button class="text-gray-400 hover:text-blue-600 transition-colors" title="Edit">✏️</button>
+                        <button (click)="onEdit(user.id)" class="text-gray-400 hover:text-blue-600 transition-colors"
+                            title="Edit">✏️</button>
                         <button (click)="onDelete(user.id)" class="text-gray-400 hover:text-red-600 transition-colors"
                             title="Delete">🗑️</button>
                     </td>

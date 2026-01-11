@@ -25,7 +25,8 @@
         <!-- Users Tab -->
         @if (activeTab() === 'users') {
         <app-user-list [users]="users()" [currentPage]="currentPage()" [totalPages]="totalPages()"
-            (pageChange)="changePage($event)" (delete)="deleteUser($event)" (toggleStatus)="toggleStatus($event)">
+            (pageChange)="changePage($event)" (delete)="deleteUser($event)" (toggleStatus)="toggleStatus($event)"
+            (edit)="editUser($event)">
         </app-user-list>
         }
 

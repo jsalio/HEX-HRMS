@@ -1,7 +1,7 @@
 <div class="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 max-w-2xl mx-auto animate-fade-in">
     <div class="mb-8">
-        <h2 class="text-2xl font-bold text-gray-800">Create New User</h2>
-        <p class="text-gray-500">Fill in the details to create a new system user</p>
+        <h2 class="text-2xl font-bold text-gray-800">{{ user ? 'Edit User' : 'Create New User' }}</h2>
+        <p class="text-gray-500">Fill in the details {{ user ? 'to edit' : 'to create' }} a system user</p>
     </div>
 
     @if (error) {

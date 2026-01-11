@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ListUserUseCase } from '../../../core/usecases/list';
 import { UserData } from '../../../core/domain/models';
 import { UserListComponent } from './components/user-list/user-list.component';
+import { Router } from '@angular/router';
 
 interface RoleMock {
   id: string;
@@ -19,6 +20,7 @@ interface RoleMock {
 })
 export class SettingsComponent implements OnInit {
   private list = inject(ListUserUseCase);
+  private router = inject(Router);
 
   activeTab = signal<'users' | 'roles'>('users');
   users = signal<UserData[]>([]);
@@ -62,6 +64,12 @@ export class SettingsComponent implements OnInit {
     console.log('Delete user', id);
     // TODO: Implement real delete
     this.users.update(users => users.filter(u => u.id !== id));
+  }
+  editUser(id: string) {
+    console.log('Edit user', id);
+    // TODO: Implement real edit
+    // this.users.update(users => users.filter(u => u.id !== id));
+    this.router.navigate(['settings/users/edit', id]);
   }
 
   toggleStatus(id: string) {

@@ -98,20 +98,4 @@ func defaultUsers(db *gorm.DB) models.SystemError {
 	}
 
 	return models.SystemError{}
-
-	// user := repo.UserGorm{
-	// 	ID:       uuid.New(),
-	// 	Username: "admin",
-	// 	Password: "admin",
-	// 	Role:     "admin",
-	// }
-	// if err := db.Create(&user).Error; err != nil {
-	// 	return models.SystemError{
-	// 		Code:    models.SystemErrorCodeMigration,
-	// 		Type:    models.SystemErrorTypeValidation,
-	// 		Level:   models.SystemErrorLevelError,
-	// 		Message: "Failed to create default user",
-	// 	}
-	// }
-	// return models.SystemError{}
 }
