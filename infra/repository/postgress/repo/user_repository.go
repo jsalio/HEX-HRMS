@@ -31,8 +31,12 @@ func (UserGorm) TableName() string {
 }
 
 func ToModel(entity models.User) UserGorm {
+	id := uuid.Nil
+	if entity.ID != "" {
+		id, _ = uuid.Parse(entity.ID)
+	}
 	return UserGorm{
-		// Id:       uuid.FromStringOrNil(entity.ID),
+		ID:       id,
 		Username: entity.Username,
 		Password: entity.Password,
 		Email:    entity.Email,
@@ -62,6 +66,16 @@ func ToEntityUser(gorm UserGorm) models.User {
 
 type UserRepository struct {
 	GenericCrud[models.User, UserGorm]
+}
+
+func (r *UserRepository) Update(id string, item models.User) (interface{}, *models.SystemError) {
+	if item.Password == "" {
+		existing, err := r.GetOnce("id", id)
+		if err == nil && existing != nil {
+			item.Password = existing.Password
+		}
+	}
+	return r.GenericCrud.Update(id, item)
 }
 
 func NewUserRepository(db *gorm.DB) contracts.UserContract {

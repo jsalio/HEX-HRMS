@@ -111,6 +111,31 @@ func (uc *UserController) Me(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Me successful"})
 }
 
+func (uc *UserController) GetUserByField(c *gin.Context) {
+	uc.SetContext(c)
+	var body models.Filter
+	_, err := uc.BaseController.GetBody(c, &body)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Message})
+		c.Abort()
+		return
+	}
+	request := contracts.NewGenericRequest(body)
+	user := userUseCase.NewGetUserByFieldUseCase(uc.userContract, request)
+	if err := user.Validate(); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Message})
+		c.Abort()
+		return
+	}
+	data, err := user.Execute()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Message})
+		c.Abort()
+		return
+	}
+	c.JSON(http.StatusOK, data)
+}
+
 func (uc *UserController) ListUsers(c *gin.Context) {
 	uc.SetContext(c)
 	var body models.SearchQuery
@@ -147,6 +172,33 @@ func (uc *UserController) ListUsers(c *gin.Context) {
 	c.JSON(http.StatusOK, data)
 }
 
+func (uc *UserController) UpdateUser(c *gin.Context) {
+	uc.SetContext(c)
+	var body models.ModifyUser
+	_, err := uc.BaseController.GetBody(c, &body)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Message})
+		c.Abort()
+		return
+	}
+
+	// Assuming NewModifyUserUseCase exists and has this signature
+	request := contracts.NewGenericRequest(body)
+	user := userUseCase.NewModifyUserUseCase(uc.userContract, request)
+	if err := user.Validate(); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Message})
+		c.Abort()
+		return
+	}
+	data, err := user.Execute()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Message})
+		c.Abort()
+		return
+	}
+	c.JSON(http.StatusOK, data)
+}
+
 func (uc *UserController) RegisterRoutes(router *gin.RouterGroup) {
 	uc.authMiddleware.Config.AddPublicRoute("POST", "/api/auth/create")
 	uc.authMiddleware.Config.AddPublicRoute("POST", "/api/auth/login")
@@ -161,6 +213,8 @@ func (uc *UserController) RegisterRoutes(router *gin.RouterGroup) {
 	{
 		private.GET("/me", uc.Me)
 		private.POST("/list", uc.ListUsers)
+		private.POST("/get-user-by-field", uc.GetUserByField)
+		private.POST("/update", uc.UpdateUser)
 
 	}
 	//return router

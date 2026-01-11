@@ -55,6 +55,10 @@ export const routes: Routes = [
         loadComponent: () => import('./ui/site/settings/pages/user-create/user-create.component').then(m => m.UserCreateComponent)
       },
       {
+        path: 'settings/users/edit/:id',
+        loadComponent: () => import('./ui/site/settings/pages/user-create/user-create.component').then(m => m.UserCreateComponent)
+      },
+      {
         path: '',
         redirectTo: 'dashboard',
         pathMatch: 'full'

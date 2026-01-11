@@ -119,3 +119,22 @@ func (g *GenericCrud[T, G]) Delete(id string) (interface{}, error) {
 	}
 	return nil, nil
 }
+
+func (g *GenericCrud[T, G]) GetOnce(key string, value any) (*T, *models.SystemError) {
+	var gormModel G
+	dbQuery := g.db.WithContext(g.currentContext()).Where(key+" = ?", value)
+	if err := dbQuery.First(&gormModel).Error; err != nil {
+		return nil, models.NewSystemError(models.SystemErrorCodeValidation, models.SystemErrorTypeValidation, models.SystemErrorLevelError, "GetOnce failed", struct{}{})
+	}
+	entity := g.ToEntity(gormModel)
+	return &entity, nil
+}
+
+func (g *GenericCrud[T, G]) Exists(key string, value any) (bool, *models.SystemError) {
+	var gormModel G
+	dbQuery := g.db.WithContext(g.currentContext()).Where(key+" = ?", value)
+	if err := dbQuery.First(&gormModel).Error; err != nil {
+		return false, models.NewSystemError(models.SystemErrorCodeValidation, models.SystemErrorTypeValidation, models.SystemErrorLevelError, "Exists failed", struct{}{})
+	}
+	return true, nil
+}

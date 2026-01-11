@@ -5,10 +5,10 @@ export const USER_REPOSITORY = new InjectionToken<UserRepository>('USER_REPOSITO
 
 export interface UserRepository {
     // getUserById(id: string): Promise<User | null>;
-    // getUserByFilter(filter: Filter): Promise<User | null>;
+    getUserByFilter(filter: Filter): Promise<UserData>;
     // getAllUsers(): Promise<User[]>;
     // createUser(user: CreateUser): Promise<User>;
-    // updateUser(id: string, user: ModifyUser): Promise<User>;
+    updateUser(user: ModifyUser): Promise<any>;
     // deleteUser(id: string): Promise<void>;
     login(loginUser:LoginUser):Promise<UserData>
     list(query: SearchQuery):Promise<PaginatedResponse<UserData>>

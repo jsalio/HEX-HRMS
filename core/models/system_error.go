@@ -26,10 +26,10 @@ type SystemError struct {
 	Type    SystemErrorType
 	Level   SystemErrorLevel
 	Message string
-	Details struct{}
+	Details any
 }
 
-func NewSystemError(code SystemErrorCode, _type SystemErrorType, level SystemErrorLevel, message string, details struct{}) *SystemError {
+func NewSystemError(code SystemErrorCode, _type SystemErrorType, level SystemErrorLevel, message string, details any) *SystemError {
 	return &SystemError{
 		Code:    code,
 		Type:    _type,

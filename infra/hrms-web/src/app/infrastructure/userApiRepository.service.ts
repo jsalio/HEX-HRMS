@@ -1,7 +1,7 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { firstValueFrom } from "rxjs";
-import { CreateUser, Filter, LoginUser, PaginatedResponse, SearchQuery, User, UserData } from "../core/domain/models";
+import { CreateUser, Filter, LoginUser, ModifyUser, PaginatedResponse, SearchQuery, User, UserData } from "../core/domain/models";
 import { UserRepository } from "../core/domain/ports/user.repo";
 import { environment } from "../../environments/environment.development";
 
@@ -27,6 +27,20 @@ export class UserApiRepository implements UserRepository {
   async createUser(user: CreateUser): Promise<UserData> {
     const dto = await firstValueFrom(
       this.http.post<UserData>(`${environment.apiUrl}/auth/create`, user)
+    );
+    return dto;
+  }
+
+  async getUserByFilter(filter: Filter): Promise<UserData> {
+    const dto = await firstValueFrom(
+      this.http.post<UserData>(`${environment.apiUrl}/auth/get-user-by-field`, filter)
+    );
+    return dto;
+  }
+
+  async updateUser(user: ModifyUser): Promise<any> {
+    const dto = await firstValueFrom(
+      this.http.post<any>(`${environment.apiUrl}/auth/update`, user)
     );
     return dto;
   }
