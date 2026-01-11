@@ -1,7 +1,7 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { firstValueFrom } from "rxjs";
-import { Filter, LoginUser, PaginatedResponse, SearchQuery, User, UserData } from "../core/domain/models";
+import { CreateUser, Filter, LoginUser, PaginatedResponse, SearchQuery, User, UserData } from "../core/domain/models";
 import { UserRepository } from "../core/domain/ports/user.repo";
 import { environment } from "../../environments/environment.development";
 
@@ -23,5 +23,14 @@ export class UserApiRepository implements UserRepository {
     );
     return dto;
   }
+
+  async createUser(user: CreateUser): Promise<UserData> {
+    const dto = await firstValueFrom(
+      this.http.post<UserData>(`${environment.apiUrl}/auth/create`, user)
+    );
+    return dto;
+  }
+
+  
 
 }

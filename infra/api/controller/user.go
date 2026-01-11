@@ -148,13 +148,13 @@ func (uc *UserController) ListUsers(c *gin.Context) {
 }
 
 func (uc *UserController) RegisterRoutes(router *gin.RouterGroup) {
-	uc.authMiddleware.Config.AddPublicRoute("POST", "/api/auth")
+	uc.authMiddleware.Config.AddPublicRoute("POST", "/api/auth/create")
 	uc.authMiddleware.Config.AddPublicRoute("POST", "/api/auth/login")
 	routeController := router.Group("/auth")
 	public := routeController.Group("/")
 	{
 		public.POST("/login", uc.LoginUser)
-		public.POST("/", uc.CreateUser)
+		public.POST("/create", uc.CreateUser)
 	}
 	private := router.Group("/auth")
 	private.Use(uc.authMiddleware.AuthMiddleware())

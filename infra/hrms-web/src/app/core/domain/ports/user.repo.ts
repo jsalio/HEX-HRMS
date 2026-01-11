@@ -12,4 +12,5 @@ export interface UserRepository {
     // deleteUser(id: string): Promise<void>;
     login(loginUser:LoginUser):Promise<UserData>
     list(query: SearchQuery):Promise<PaginatedResponse<UserData>>
+    createUser(user: CreateUser): Promise<UserData>;
 }

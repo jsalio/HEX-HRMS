@@ -24,7 +24,11 @@ type CreateUser struct {
 	Username string
 	Password string
 	Email    string
+	Role     string
+	Name     string
+	LastName string
 	Type     UserType
+	Picture  string
 }
 
 type ModifyUser struct {
@@ -73,6 +77,11 @@ func (cu *CreateUser) ToUser() *User {
 		Password: cu.Password,
 		Email:    cu.Email,
 		Type:     cu.Type,
+		Name:     cu.Name,
+		LastName: cu.LastName,
+		Picture:  cu.Picture,
+		Role:     cu.Role,
+		Active:   true,
 	}
 }
 

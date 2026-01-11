@@ -21,6 +21,8 @@ export interface CreateUser {
   password: string;
   email: string;
   type: UserType;
+  role: string;
+  picture: string;
 }
 
 export interface ModifyUser {
