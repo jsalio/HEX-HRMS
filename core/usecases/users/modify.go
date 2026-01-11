@@ -71,13 +71,11 @@ func (u *ModifyUserUseCase) Validate() *models.SystemError {
 
 // Execute performs the user modification operation
 // It builds the user data from the request and passes it to the user contract to update the user
-func (u *ModifyUserUseCase) Execute() (*string, *models.SystemError) {
+func (u *ModifyUserUseCase) Execute() (*models.UserData, *models.SystemError) {
 	request := u.request.Build()
 	user, err := u.userContract.Update(request.ID, *request.ToUser())
 	if err != nil {
 		return nil, err
 	}
-	result := models.NewDynamicResult(user)
-	data := models.MustConvert[string](result)
-	return &data, nil
+	return user.ToUserData(), nil
 }

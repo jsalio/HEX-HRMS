@@ -68,7 +68,7 @@ type UserRepository struct {
 	GenericCrud[models.User, UserGorm]
 }
 
-func (r *UserRepository) Update(id string, item models.User) (interface{}, *models.SystemError) {
+func (r *UserRepository) Update(id string, item models.User) (models.User, *models.SystemError) {
 	if item.Password == "" {
 		existing, err := r.GetOnce("id", id)
 		if err == nil && existing != nil {

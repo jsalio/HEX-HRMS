@@ -104,10 +104,10 @@ func (g *GenericCrud[T, G]) Create(item T) (T, *models.SystemError) {
 	return g.ToEntity(gormModel), nil
 }
 
-func (g *GenericCrud[T, G]) Update(id string, item T) (interface{}, *models.SystemError) {
+func (g *GenericCrud[T, G]) Update(id string, item T) (T, *models.SystemError) {
 	gormModel := g.ToGorm(item)
 	if err := g.db.WithContext(g.currentContext()).Save(&gormModel).Error; err != nil {
-		return nil, models.NewSystemError(models.SystemErrorCodeValidation, models.SystemErrorTypeValidation, models.SystemErrorLevelError, "Update failed", struct{}{})
+		return item, models.NewSystemError(models.SystemErrorCodeValidation, models.SystemErrorTypeValidation, models.SystemErrorLevelError, "Update failed", struct{}{})
 	}
 	return g.ToEntity(gormModel), nil
 }

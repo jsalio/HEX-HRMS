@@ -19,7 +19,7 @@ type WriteOperation[T any] interface {
 	// 		return nil, err
 	// 	}
 	// 	return data, nil
-	Update(id string, item T) (interface{}, *models.SystemError)
+	Update(id string, item T) (T, *models.SystemError)
 	// Delete basic resource in repository
 	// example :
 	// 		data,err:=Delete(id string)

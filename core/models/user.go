@@ -39,6 +39,8 @@ type ModifyUser struct {
 	Password string
 	Email    string
 	Type     UserType
+	Role     string
+	Picture  string
 }
 
 type UserData struct {
@@ -94,6 +96,8 @@ func (mu *ModifyUser) ToUser() *User {
 		Password: mu.Password,
 		Email:    mu.Email,
 		Type:     mu.Type,
+		Role:     mu.Role,
+		Picture:  mu.Picture,
 	}
 }
 
