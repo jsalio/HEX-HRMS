@@ -73,6 +73,7 @@ func (s *Server) SetupControllers() {
 	s.appController = []BaseController.Controller{
 		controller.NewUserController(s.authMiddleware, s.context.userContract, s.cryptographyContext),
 		controller.NewRoleController(s.authMiddleware, s.context.roleContract, s.context.permissionContract),
+		controller.NewDepartmentController(s.context.departmentContract, s.authMiddleware),
 	}
 }
 
