@@ -6,6 +6,7 @@ import (
 	"hrms.local/core/contracts"
 	"hrms.local/core/models"
 	permissionUseCase "hrms.local/core/usecases/permissions"
+	roleUseCase "hrms.local/core/usecases/roles"
 	"hrms.local/infra/api/middleware"
 	"hrms.local/infra/api/types"
 	"hrms.local/repository/postgress/repo"
@@ -37,13 +38,19 @@ func (rc *RoleController) SetContext(c *gin.Context) {
 
 func (rc *RoleController) Create(c *gin.Context) {
 	rc.SetContext(c)
-	var role models.Role
-	if _, err := rc.BaseController.GetBody(c, &role); err != nil {
+	var body models.CreateRole
+	if _, err := rc.BaseController.GetBody(c, &body); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Message})
 		return
 	}
 
-	createdRole, err := rc.roleContract.Create(role)
+	useCase := roleUseCase.NewCreateRoleUsecase(rc.roleContract, contracts.NewGenericRequest(body))
+	if err := useCase.Validate(); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Message})
+		return
+	}
+
+	createdRole, err := useCase.Execute()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Message})
 		return
@@ -53,13 +60,19 @@ func (rc *RoleController) Create(c *gin.Context) {
 
 func (rc *RoleController) Update(c *gin.Context) {
 	rc.SetContext(c)
-	var role models.Role
-	if _, err := rc.BaseController.GetBody(c, &role); err != nil {
+	var body models.Role
+	if _, err := rc.BaseController.GetBody(c, &body); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Message})
 		return
 	}
 
-	updatedRole, err := rc.roleContract.Update(role.ID, role)
+	useCase := roleUseCase.NewUpdateRoleUsecase(rc.roleContract, contracts.NewGenericRequest(body))
+	if err := useCase.Validate(); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Message})
+		return
+	}
+
+	updatedRole, err := useCase.Execute()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Message})
 		return
@@ -77,10 +90,14 @@ func (rc *RoleController) Delete(c *gin.Context) {
 		return
 	}
 
-	if _, err := rc.roleContract.Delete(body.ID); err != nil {
-		// Assuming Delete returns error interface, need to check if it's a SystemError or cast it
-		// The contract says Delete(id string) (interface{}, error)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+	useCase := roleUseCase.NewDeleteRoleUsecase(rc.roleContract, body.ID)
+	if err := useCase.Validate(); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Message})
+		return
+	}
+
+	if err := useCase.Execute(); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Message})
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{"message": "Role deleted"})
@@ -96,7 +113,13 @@ func (rc *RoleController) Get(c *gin.Context) {
 		return
 	}
 
-	role, err := rc.roleContract.GetOnce("id", body.ID)
+	useCase := roleUseCase.NewGetRoleUsecase(rc.roleContract, body.ID)
+	if err := useCase.Validate(); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Message})
+		return
+	}
+
+	role, err := useCase.Execute()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Message})
 		return
@@ -107,7 +130,6 @@ func (rc *RoleController) Get(c *gin.Context) {
 func (rc *RoleController) GetAll(c *gin.Context) {
 	rc.SetContext(c)
 	var query models.SearchQuery
-	// Handle optional body for search query, or default to all
 	if c.Request.ContentLength > 0 {
 		if _, err := rc.BaseController.GetBody(c, &query); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Message})
@@ -115,11 +137,17 @@ func (rc *RoleController) GetAll(c *gin.Context) {
 		}
 	} else {
 		query = models.SearchQuery{
-			Pagination: models.Pagination{Page: 1, Limit: 100}, // Default limit
+			Pagination: models.Pagination{Page: 1, Limit: 100},
 		}
 	}
 
-	roles, err := rc.roleContract.GetByFilter(query)
+	useCase := roleUseCase.NewListRolesUsecase(rc.roleContract, contracts.NewGenericRequest(query))
+	if err := useCase.Validate(); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Message})
+		return
+	}
+
+	roles, err := useCase.Execute()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Message})
 		return
@@ -135,7 +163,13 @@ func (rc *RoleController) GetPermissions(c *gin.Context) {
 		return
 	}
 
-	permissions, err := rc.roleContract.GetPermissions(roleID)
+	useCase := roleUseCase.NewGetPermissionsUsecase(rc.roleContract, roleID)
+	if err := useCase.Validate(); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Message})
+		return
+	}
+
+	permissions, err := useCase.Execute()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Message})
 		return
@@ -143,7 +177,6 @@ func (rc *RoleController) GetPermissions(c *gin.Context) {
 	c.JSON(http.StatusOK, permissions)
 }
 
-// System permissions listing (using Use Case as requested)
 func (rc *RoleController) ListSystemPermissions(c *gin.Context) {
 	useCase := permissionUseCase.NewListPermissionsUseCase(rc.permissionContract)
 	permissions, err := useCase.Execute()
@@ -164,8 +197,6 @@ func (rc *RoleController) RegisterRoutes(router *gin.RouterGroup) {
 		roles.POST("/get", rc.Get)
 		roles.POST("/get-all", rc.GetAll)
 		roles.GET("/get-permissions/:role_id", rc.GetPermissions)
-
-		// Additional endpoint just in case for listing all system permissions (though not explicitly requested in list, highly useful)
 		roles.GET("/system-permissions", rc.ListSystemPermissions)
 	}
 }
