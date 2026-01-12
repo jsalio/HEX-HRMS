@@ -48,11 +48,19 @@ export const routes: Routes = [
       },
       {
         path: 'settings',
-        loadComponent: () => import('./ui/site/home/home.component').then(m => m.HomeComponent) // TODO: Create SettingsComponent
+        loadComponent: () => import('./ui/site/settings/settings.component').then(m => m.SettingsComponent)
+      },
+      {
+        path: 'settings/users/create',
+        loadComponent: () => import('./ui/site/settings/pages/user-create/user-create.component').then(m => m.UserCreateComponent)
+      },
+      {
+        path: 'settings/users/edit/:id',
+        loadComponent: () => import('./ui/site/settings/pages/user-create/user-create.component').then(m => m.UserCreateComponent)
       },
       {
         path: '',
-        redirectTo: 'login',
+        redirectTo: 'dashboard',
         pathMatch: 'full'
       }
     ]

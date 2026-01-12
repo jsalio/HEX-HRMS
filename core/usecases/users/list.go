@@ -42,12 +42,12 @@ import (
 //	}
 type ListUserUseCase struct {
 	userContract contracts.UserContract
-	request      contracts.IGenericRequest[models.Filters]
+	request      contracts.IGenericRequest[models.SearchQuery]
 }
 
 // NewListUserUseCase creates a new instance of ListUserUseCase.
 // It injects the user contract (dependency inversion) and the request data.
-func NewListUserUseCase(userContract contracts.UserContract, request contracts.IGenericRequest[models.Filters]) *ListUserUseCase {
+func NewListUserUseCase(userContract contracts.UserContract, request contracts.IGenericRequest[models.SearchQuery]) *ListUserUseCase {
 	return &ListUserUseCase{
 		userContract: userContract,
 		request:      request,
@@ -58,29 +58,39 @@ func NewListUserUseCase(userContract contracts.UserContract, request contracts.I
 // It checks if the request is empty and validates each filter against the User model using reflection.
 func (u *ListUserUseCase) Validate() *models.SystemError {
 	request := u.request.Build()
-	if len(request) == 0 {
-		return models.NewSystemError(models.SystemErrorCodeValidation, models.SystemErrorTypeValidation, models.SystemErrorLevelError, "request is empty", struct{}{})
-	}
-
-	filters := models.Filters(request)
-	if err := filters.Validate(models.User{}); err != nil {
+	if err := request.Filters.Validate(models.User{}); err != nil {
 		return err
 	}
-
 	return nil
 }
 
 // Execute performs the user retrieval operation.
 // It builds the filters from the request and passes them to the user contract to fetch the data.
-func (u *ListUserUseCase) Execute() ([]*models.User, *models.SystemError) {
-	filters := u.request.Build()
-	data, err := u.userContract.GetByFilter(filters...)
+func (u *ListUserUseCase) Execute() (*models.PaginatedResponse[*models.UserData], *models.SystemError) {
+	query := u.request.Build()
+	paginatedData, err := u.userContract.GetByFilter(query)
 	if err != nil {
 		return nil, err
 	}
-	var result []*models.User
-	for i := range data {
-		result = append(result, &data[i])
+
+	var result []*models.UserData
+	for i := range paginatedData.Rows {
+		result = append(result, &models.UserData{
+			Id:       paginatedData.Rows[i].ID,
+			Username: paginatedData.Rows[i].Username,
+			Name:     paginatedData.Rows[i].Name,
+			LastName: paginatedData.Rows[i].LastName,
+			Email:    paginatedData.Rows[i].Email,
+			Type:     paginatedData.Rows[i].Type,
+			Picture:  paginatedData.Rows[i].Picture,
+			Role:     paginatedData.Rows[i].Role,
+			Active:   paginatedData.Rows[i].Active,
+		})
 	}
-	return result, nil
+
+	return &models.PaginatedResponse[*models.UserData]{
+		TotalRows:  paginatedData.TotalRows,
+		TotalPages: paginatedData.TotalPages,
+		Rows:       result,
+	}, nil
 }

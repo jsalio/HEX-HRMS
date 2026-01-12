@@ -55,3 +55,7 @@ require (
 )
 
 replace hrms.local/security v0.0.0 => ../../boundaries/security
+
+replace hrms.local/core v0.0.0 => ../../core
+
+replace hrms.local/repository v0.0.0 => ../../infra/repository

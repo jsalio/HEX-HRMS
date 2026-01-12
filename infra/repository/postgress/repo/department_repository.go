@@ -1,9 +1,10 @@
 package repo
 
 import (
+	"time"
+
 	"hrms.local/core/contracts"
 	"hrms.local/core/models"
-	"time"
 
 	"github.com/google/uuid"
 	"gorm.io/gorm"

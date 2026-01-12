@@ -25,3 +25,4 @@ require (
 	gorm.io/driver/postgres v1.6.0
 )
 
+replace hrms.local/core v0.0.0 => ../../core

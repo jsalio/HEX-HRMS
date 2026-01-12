@@ -1,5 +1,6 @@
 // User models
 export * from './user.model';
+export * from './pagination.model';
 
 // Department models
 export * from './department.model';
@@ -18,3 +19,7 @@ export * from './system-error.model';
 
 // GUID models
 export * from './guid.model';
+
+// Role and Permission models
+export * from './role.model';
+export * from './permission.model';

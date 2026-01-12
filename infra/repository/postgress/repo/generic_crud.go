@@ -2,8 +2,9 @@ package repo
 
 import (
 	"context"
-	"hrms.local/core/models"
 	"sync"
+
+	"hrms.local/core/models"
 
 	"gorm.io/gorm"
 )
@@ -44,13 +45,22 @@ func (g *GenericCrud[T, G]) currentContext() context.Context {
 	return g.ctx
 }
 
-func (g *GenericCrud[T, G]) GetByFilter(filters ...models.Filter) ([]T, *models.SystemError) {
-	var gormModels []G
-	query := g.db.WithContext(g.currentContext())
-	for _, filter := range filters {
-		query = query.Where(filter.Key+" = ?", filter.Value)
+func (g *GenericCrud[T, G]) GetByFilter(query models.SearchQuery) (*models.PaginatedResponse[T], *models.SystemError) {
+	totalRows, sysErr := g.CountByFilter(query)
+	if sysErr != nil {
+		return nil, sysErr
 	}
-	if err := query.Find(&gormModels).Error; err != nil {
+
+	var gormModels []G
+	dbQuery := g.db.WithContext(g.currentContext())
+	for _, filter := range query.Filters {
+		dbQuery = dbQuery.Where(filter.Key+" = ?", filter.Value)
+	}
+
+	limit := query.Pagination.GetLimit()
+	dbQuery = dbQuery.Limit(limit).Offset(query.Pagination.GetOffset())
+
+	if err := dbQuery.Find(&gormModels).Error; err != nil {
 		return nil, models.NewSystemError(models.SystemErrorCodeValidation, models.SystemErrorTypeValidation, models.SystemErrorLevelError, "Query failed", struct{}{})
 	}
 
@@ -58,7 +68,32 @@ func (g *GenericCrud[T, G]) GetByFilter(filters ...models.Filter) ([]T, *models.
 	for _, gm := range gormModels {
 		entities = append(entities, g.ToEntity(gm))
 	}
-	return entities, nil
+
+	totalPages := 0
+	if limit > 0 {
+		totalPages = int((totalRows + int64(limit) - 1) / int64(limit))
+	}
+
+	return &models.PaginatedResponse[T]{
+		TotalRows:  totalRows,
+		TotalPages: totalPages,
+		Rows:       entities,
+	}, nil
+}
+
+func (g *GenericCrud[T, G]) CountByFilter(query models.SearchQuery) (int64, *models.SystemError) {
+	var count int64
+	var gormModel G
+	dbQuery := g.db.WithContext(g.currentContext()).Model(&gormModel)
+	for _, filter := range query.Filters {
+		dbQuery = dbQuery.Where(filter.Key+" = ?", filter.Value)
+	}
+
+	if err := dbQuery.Count(&count).Error; err != nil {
+		return 0, models.NewSystemError(models.SystemErrorCodeValidation, models.SystemErrorTypeValidation, models.SystemErrorLevelError, "Count failed", struct{}{})
+	}
+
+	return count, nil
 }
 
 func (g *GenericCrud[T, G]) Create(item T) (T, *models.SystemError) {
@@ -69,10 +104,10 @@ func (g *GenericCrud[T, G]) Create(item T) (T, *models.SystemError) {
 	return g.ToEntity(gormModel), nil
 }
 
-func (g *GenericCrud[T, G]) Update(id string, item T) (interface{}, *models.SystemError) {
+func (g *GenericCrud[T, G]) Update(id string, item T) (T, *models.SystemError) {
 	gormModel := g.ToGorm(item)
 	if err := g.db.WithContext(g.currentContext()).Save(&gormModel).Error; err != nil {
-		return nil, models.NewSystemError(models.SystemErrorCodeValidation, models.SystemErrorTypeValidation, models.SystemErrorLevelError, "Update failed", struct{}{})
+		return item, models.NewSystemError(models.SystemErrorCodeValidation, models.SystemErrorTypeValidation, models.SystemErrorLevelError, "Update failed", struct{}{})
 	}
 	return g.ToEntity(gormModel), nil
 }
@@ -83,4 +118,23 @@ func (g *GenericCrud[T, G]) Delete(id string) (interface{}, error) {
 		return nil, models.NewSystemError(models.SystemErrorCodeValidation, models.SystemErrorTypeValidation, models.SystemErrorLevelError, "Delete failed", struct{}{})
 	}
 	return nil, nil
+}
+
+func (g *GenericCrud[T, G]) GetOnce(key string, value any) (*T, *models.SystemError) {
+	var gormModel G
+	dbQuery := g.db.WithContext(g.currentContext()).Where(key+" = ?", value)
+	if err := dbQuery.First(&gormModel).Error; err != nil {
+		return nil, models.NewSystemError(models.SystemErrorCodeValidation, models.SystemErrorTypeValidation, models.SystemErrorLevelError, "GetOnce failed", struct{}{})
+	}
+	entity := g.ToEntity(gormModel)
+	return &entity, nil
+}
+
+func (g *GenericCrud[T, G]) Exists(key string, value any) (bool, *models.SystemError) {
+	var gormModel G
+	dbQuery := g.db.WithContext(g.currentContext()).Where(key+" = ?", value)
+	if err := dbQuery.First(&gormModel).Error; err != nil {
+		return false, models.NewSystemError(models.SystemErrorCodeValidation, models.SystemErrorTypeValidation, models.SystemErrorLevelError, "Exists failed", struct{}{})
+	}
+	return true, nil
 }

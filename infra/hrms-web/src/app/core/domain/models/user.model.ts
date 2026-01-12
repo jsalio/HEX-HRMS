@@ -6,6 +6,8 @@ export enum UserType {
 export interface User {
   id: string;
   username: string;
+  name: string;
+  lastName: string;
   password: string;
   email: string;
   type: UserType;
@@ -14,14 +16,20 @@ export interface User {
 
 export interface CreateUser {
   username: string;
+  name: string;
+  lastName: string;
   password: string;
   email: string;
   type: UserType;
+  role: string;
+  picture: string;
 }
 
 export interface ModifyUser {
   id: string;
   username: string;
+  name: string;
+  lastName: string;
   password: string;
   email: string;
   type: UserType;
@@ -30,6 +38,8 @@ export interface ModifyUser {
 export interface UserData {
   id: string;
   username: string;
+  name: string;
+  lastName: string;
   email: string;
   type: UserType;
   token: string;

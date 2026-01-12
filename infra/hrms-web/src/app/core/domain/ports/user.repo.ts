@@ -1,14 +1,16 @@
 import { InjectionToken } from "@angular/core";
-import { CreateUser, Filter, LoginUser, ModifyUser, User, UserData } from "../models";
+import { CreateUser, Filter, LoginUser, ModifyUser, PaginatedResponse, SearchQuery, User, UserData } from "../models";
 
 export const USER_REPOSITORY = new InjectionToken<UserRepository>('USER_REPOSITORY');
 
 export interface UserRepository {
     // getUserById(id: string): Promise<User | null>;
-    // getUserByFilter(filter: Filter): Promise<User | null>;
+    getUserByFilter(filter: Filter): Promise<UserData>;
     // getAllUsers(): Promise<User[]>;
     // createUser(user: CreateUser): Promise<User>;
-    // updateUser(id: string, user: ModifyUser): Promise<User>;
+    updateUser(user: ModifyUser): Promise<any>;
     // deleteUser(id: string): Promise<void>;
     login(loginUser:LoginUser):Promise<UserData>
+    list(query: SearchQuery):Promise<PaginatedResponse<UserData>>
+    createUser(user: CreateUser): Promise<UserData>;
 }

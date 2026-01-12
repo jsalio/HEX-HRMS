@@ -1,0 +1,43 @@
+<div class="settings-container animate-fade-in p-6 max-w-7xl mx-auto">
+    <!-- Header -->
+    <div class="flex justify-between items-end mb-8">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-800">Settings</h1>
+            <p class="text-gray-500 mt-1">Manage system users, roles and configurations</p>
+        </div>
+        <div class="flex space-x-2 bg-gray-100 p-1 rounded-xl shadow-inner">
+            <button (click)="setTab('users')" [class.bg-white]="activeTab() === 'users'"
+                [class.text-primary-600]="activeTab() === 'users'" [class.shadow-sm]="activeTab() === 'users'"
+                class="px-6 py-2 rounded-lg text-sm font-semibold transition-all duration-200 hover:text-primary-500">
+                Users
+            </button>
+            <button (click)="setTab('roles')" [class.bg-white]="activeTab() === 'roles'"
+                [class.text-primary-600]="activeTab() === 'roles'" [class.shadow-sm]="activeTab() === 'roles'"
+                class="px-6 py-2 rounded-lg text-sm font-semibold transition-all duration-200 hover:text-primary-500">
+                Roles
+            </button>
+        </div>
+    </div>
+
+    <!-- Content Card -->
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden min-h-[500px]">
+
+        <!-- Users Tab -->
+        @if (activeTab() === 'users') {
+        <app-user-list [users]="users()" [currentPage]="currentPage()" [totalPages]="totalPages()"
+            (pageChange)="changePage($event)" (delete)="deleteUser($event)" (toggleStatus)="toggleStatus($event)"
+            (edit)="editUser($event)">
+        </app-user-list>
+        }
+
+        @if (activeTab() === 'roles') {
+        <app-role-list [roles]="roles()" (create)="createRole()" (edit)="editRole($event)">
+        </app-role-list>
+
+        @if (showRoleForm()) {
+        <app-role-form [role]="selectedRole()" (cancel)="closeRoleForm()" (saved)="onRoleSaved()">
+        </app-role-form>
+        }
+        }
+    </div>
+</div>

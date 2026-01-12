@@ -111,9 +111,52 @@ func (uc *UserController) Me(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Me successful"})
 }
 
+func (uc *UserController) GetUserByField(c *gin.Context) {
+	uc.SetContext(c)
+	var body models.Filter
+	_, err := uc.BaseController.GetBody(c, &body)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Message})
+		c.Abort()
+		return
+	}
+	request := contracts.NewGenericRequest(body)
+	user := userUseCase.NewGetUserByFieldUseCase(uc.userContract, request)
+	if err := user.Validate(); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Message})
+		c.Abort()
+		return
+	}
+	data, err := user.Execute()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Message})
+		c.Abort()
+		return
+	}
+	c.JSON(http.StatusOK, data)
+}
+
 func (uc *UserController) ListUsers(c *gin.Context) {
-	filters := models.Filters{}
-	request := contracts.NewGenericRequest(filters)
+	uc.SetContext(c)
+	var body models.SearchQuery
+
+	if c.Request.ContentLength > 0 {
+		if _, err := uc.BaseController.GetBody(c, &body); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Message})
+			c.Abort()
+			return
+		}
+	} else {
+		body = models.SearchQuery{
+			Filters: models.Filters{},
+			Pagination: models.Pagination{
+				Page:  1,
+				Limit: 10,
+			},
+		}
+	}
+
+	request := contracts.NewGenericRequest(body)
 	users := userUseCase.NewListUserUseCase(uc.userContract, request)
 	if err := users.Validate(); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Message})
@@ -129,20 +172,49 @@ func (uc *UserController) ListUsers(c *gin.Context) {
 	c.JSON(http.StatusOK, data)
 }
 
+func (uc *UserController) UpdateUser(c *gin.Context) {
+	uc.SetContext(c)
+	var body models.ModifyUser
+	_, err := uc.BaseController.GetBody(c, &body)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Message})
+		c.Abort()
+		return
+	}
+
+	// Assuming NewModifyUserUseCase exists and has this signature
+	request := contracts.NewGenericRequest(body)
+	user := userUseCase.NewModifyUserUseCase(uc.userContract, request)
+	if err := user.Validate(); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Message})
+		c.Abort()
+		return
+	}
+	data, err := user.Execute()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Message})
+		c.Abort()
+		return
+	}
+	c.JSON(http.StatusOK, data)
+}
+
 func (uc *UserController) RegisterRoutes(router *gin.RouterGroup) {
-	uc.authMiddleware.Config.AddPublicRoute("POST", "/api/auth")
+	uc.authMiddleware.Config.AddPublicRoute("POST", "/api/auth/create")
 	uc.authMiddleware.Config.AddPublicRoute("POST", "/api/auth/login")
 	routeController := router.Group("/auth")
 	public := routeController.Group("/")
 	{
 		public.POST("/login", uc.LoginUser)
-		public.POST("/", uc.CreateUser)
+		public.POST("/create", uc.CreateUser)
 	}
 	private := router.Group("/auth")
 	private.Use(uc.authMiddleware.AuthMiddleware())
 	{
 		private.GET("/me", uc.Me)
-		private.GET("/list", uc.ListUsers)
+		private.POST("/list", uc.ListUsers)
+		private.POST("/get-user-by-field", uc.GetUserByField)
+		private.POST("/update", uc.UpdateUser)
 
 	}
 	//return router

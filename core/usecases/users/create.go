@@ -65,14 +65,18 @@ func (u *CreateUserUseCase) Validate() *models.SystemError {
 		return err
 	}
 
-	user, err := u.userContract.GetByFilter(models.Filter{
-		Key:   "username",
-		Value: request.Username,
+	paginatedData, err := u.userContract.GetByFilter(models.SearchQuery{
+		Filters: models.Filters{
+			{
+				Key:   "Username",
+				Value: request.Username,
+			},
+		},
 	})
 	if err != nil {
 		return err
 	}
-	if user != nil {
+	if len(paginatedData.Rows) > 0 {
 		return models.NewSystemError(models.SystemErrorCodeInternal, models.SystemErrorTypeValidation, models.SystemErrorLevelError, "El usuario ya existe", struct{}{})
 	}
 	return nil

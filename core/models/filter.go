@@ -81,3 +81,40 @@ func (f *Filter) Build() (Filter, *SystemError) {
 	}
 	return *f, nil
 }
+
+type Pagination struct {
+	Page  int `json:"page"`
+	Limit int `json:"limit"`
+}
+
+func (p *Pagination) GetOffset() int {
+	if p.Page <= 0 {
+		return 0
+	}
+	return (p.Page - 1) * p.Limit
+}
+
+func (p *Pagination) GetLimit() int {
+	if p.Limit <= 0 {
+		return 10
+	}
+	return p.Limit
+}
+
+type SearchQuery struct {
+	Filters    Filters    `json:"filters"`
+	Pagination Pagination `json:"pagination"`
+}
+
+func (sq *SearchQuery) Validate(structure any) *SystemError {
+	if err := sq.Filters.Validate(structure); err != nil {
+		return err
+	}
+	return nil
+}
+
+type PaginatedResponse[T any] struct {
+	TotalRows  int64 `json:"total_rows"`
+	TotalPages int   `json:"total_pages"`
+	Rows       []T   `json:"rows"`
+}
