@@ -1,7 +1,8 @@
-import { Component, EventEmitter, Input, Output, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, Input, Output, OnChanges, OnInit, SimpleChanges, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { CreateUser, UserData, UserType } from '../../../../../core/domain/models';
+import { CreateUser, UserData, UserType, Role } from '../../../../../core/domain/models';
+import { ListRoleUseCase } from '../../../../../core/usecases/role';
 
 @Component({
   selector: 'app-user-form',
@@ -10,15 +11,18 @@ import { CreateUser, UserData, UserType } from '../../../../../core/domain/model
   templateUrl: './user-form.component.html',
   styleUrl: './user-form.component.css'
 })
-export class UserFormComponent implements OnChanges {
+export class UserFormComponent implements OnChanges, OnInit {
   @Input() saving = false;
   @Input() error: string | null = null;
   @Input() user: UserData | null = null;
-  @Output() save = new EventEmitter<CreateUser>(); // Or ModifyUser but structure is similar enough often
+  @Output() save = new EventEmitter<CreateUser>();
   @Output() cancel = new EventEmitter<void>();
+
+  private listRoleUseCase = inject(ListRoleUseCase);
 
   form: FormGroup;
   userTypes = Object.values(UserType);
+  roles = signal<Role[]>([]);
 
   constructor(private fb: FormBuilder) {
     this.form = this.fb.group({
@@ -32,10 +36,24 @@ export class UserFormComponent implements OnChanges {
       picture: ['']
     });
 
-    // Sync username with email since UI only has one field (if creating)
+    // Sync username with email
     this.form.get('username')?.valueChanges.subscribe(value => {
-       // Only sync if not editing? Or always? Assuming always for now.
       this.form.patchValue({ email: value }, { emitEvent: false });
+    });
+  }
+
+  ngOnInit(): void {
+    this.fetchRoles();
+  }
+
+  fetchRoles(): void {
+    this.listRoleUseCase.Execute({
+      filters: [],
+      pagination: { page: 1, limit: 100 }
+    }).then(data => {
+      this.roles.set(data.rows);
+    }).catch(err => {
+      console.error('Error fetching roles:', err);
     });
   }
 
@@ -50,12 +68,8 @@ export class UserFormComponent implements OnChanges {
         role: this.user.role,
         picture: this.user.picture
       });
-      // Handle password - usually empty on edit?
-      // For now, if editing, we might need to remove password validator or keep it if password change is forced/allowed.
-      // If user is passed, it's edit mode. Make password optional if not changing?
-      // Simpler: Keep it as is. User needs to re-enter password to save? No, that's bad UX.
-      // Better: Remove required validator from password if in edit mode.
       
+      // Make password optional in edit mode
       this.form.get('password')?.clearValidators();
       this.form.get('password')?.updateValueAndValidity();
     }
