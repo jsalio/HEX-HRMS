@@ -1,0 +1,36 @@
+<div class="p-8 animate-slide-in">
+    <div class="flex justify-between items-center mb-6">
+        <h2 class="font-bold text-gray-700 text-lg">System Roles</h2>
+        <button (click)="createNewRole()" class="text-primary-600 text-sm font-semibold hover:underline">+ Define New
+            Role</button>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        @for (role of roles(); track role.id) {
+        <div (click)="editRole(role)"
+            class="cursor-pointer p-6 rounded-2xl border border-gray-100 bg-gray-50/30 hover:shadow-md transition-all group">
+            <div class="flex justify-between items-start mb-4">
+                <div class="p-3 bg-white rounded-xl shadow-sm group-hover:bg-primary-50 transition-colors">
+                    <span class="text-2xl">🛡️</span>
+                </div>
+                <button class="text-gray-400 hover:text-gray-600">•••</button>
+            </div>
+            <h3 class="font-bold text-gray-800 text-lg">{{ role.name }}</h3>
+            <p class="text-xs text-gray-500 mb-4">{{ role.permissions.length }} permissions assigned</p>
+
+            <div class="flex flex-wrap gap-2">
+                @for (perm of role.permissions.slice(0, 2); track perm.name) {
+                <span class="px-2 py-1 bg-white border border-gray-200 rounded text-[10px] text-gray-600 font-medium">
+                    {{ perm.name }}
+                </span>
+                }
+                @if (role.permissions.length > 2) {
+                <span class="px-2 py-1 bg-gray-100 rounded text-[10px] text-gray-500 font-medium">
+                    {{ role.permissions.length - 2 }} more
+                </span>
+                }
+            </div>
+        </div>
+        }
+    </div>
+</div>

@@ -19,3 +19,7 @@ export * from './system-error.model';
 
 // GUID models
 export * from './guid.model';
+
+// Role and Permission models
+export * from './role.model';
+export * from './permission.model';

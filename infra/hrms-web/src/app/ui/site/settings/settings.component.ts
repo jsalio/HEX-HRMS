@@ -1,44 +1,43 @@
 import { Component, OnInit, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ListUserUseCase } from '../../../core/usecases/list';
-import { UserData } from '../../../core/domain/models';
+import { ListRoleUseCase } from '../../../core/usecases/role';
+import { UserData, Role } from '../../../core/domain/models';
 import { UserListComponent } from './components/user-list/user-list.component';
+import { RoleListComponent } from './components/role-list/role-list.component';
+import { RoleFormComponent } from './components/role-form/role-form.component';
 import { Router } from '@angular/router';
-
-interface RoleMock {
-  id: string;
-  name: string;
-  permissions: string[];
-}
 
 @Component({
   selector: 'app-settings',
   standalone: true,
-  imports: [CommonModule, UserListComponent],
+  imports: [CommonModule, UserListComponent, RoleListComponent, RoleFormComponent],
   templateUrl: './settings.component.html',
   styleUrl: './settings.component.css'
 })
 export class SettingsComponent implements OnInit {
-  private list = inject(ListUserUseCase);
+  private listUser = inject(ListUserUseCase);
+  private listRole = inject(ListRoleUseCase);
   private router = inject(Router);
 
   activeTab = signal<'users' | 'roles'>('users');
   users = signal<UserData[]>([]);
+  roles = signal<Role[]>([]);
   currentPage = signal<number>(1);
   totalPages = signal<number>(1);
   pageSize = signal<number>(5);
-  roles = signal<RoleMock[]>([
-    { id: '1', name: 'Administrator', permissions: ['all_access', 'manage_users', 'manage_roles'] },
-    { id: '2', name: 'Manager', permissions: ['view_reports', 'manage_employees'] },
-    { id: '3', name: 'Developer', permissions: ['view_dashboard', 'manage_code'] },
-  ]);
+
+  // Modal State
+  showRoleForm = signal<boolean>(false);
+  selectedRole = signal<Role | null>(null);
 
   ngOnInit(): void {
     this.fetchUsers();
+    this.fetchRoles();
   }
 
   fetchUsers(page: number = 1): void {
-    this.list.Execute({ 
+    this.listUser.Execute({ 
       filters: [], 
       pagination: { page: page, limit: this.pageSize() } 
     }).then((data) => {
@@ -47,6 +46,17 @@ export class SettingsComponent implements OnInit {
       this.currentPage.set(page);
     }).catch(err => {
       console.error('Error fetching users:', err);
+    });
+  }
+
+  fetchRoles(): void {
+    this.listRole.Execute({
+      filters: [],
+      pagination: { page: 1, limit: 100 }
+    }).then((data) => {
+      this.roles.set(data.rows);
+    }).catch(err => {
+        console.error('Error fetching roles:', err);
     });
   }
 
@@ -66,14 +76,32 @@ export class SettingsComponent implements OnInit {
     this.users.update(users => users.filter(u => u.id !== id));
   }
   editUser(id: string) {
-    console.log('Edit user', id);
-    // TODO: Implement real edit
-    // this.users.update(users => users.filter(u => u.id !== id));
     this.router.navigate(['settings/users/edit', id]);
   }
 
   toggleStatus(id: string) {
     console.log('Toggle status', id);
-    // TODO: Implement real status toggle
+  }
+
+  // --- Role Actions ---
+
+  createRole() {
+    this.selectedRole.set(null);
+    this.showRoleForm.set(true);
+  }
+
+  editRole(role: Role) {
+    this.selectedRole.set(role);
+    this.showRoleForm.set(true);
+  }
+
+  closeRoleForm() {
+    this.showRoleForm.set(false);
+    this.selectedRole.set(null);
+  }
+
+  onRoleSaved() {
+    this.fetchRoles();
+    this.closeRoleForm();
   }
 }
