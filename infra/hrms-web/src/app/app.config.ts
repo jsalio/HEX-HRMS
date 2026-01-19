@@ -13,6 +13,9 @@ import { ROLE_REPOSITORY } from './core/domain/ports/role.repo';
 import { DepartmentApiRepository } from './infrastructure/departmentApiRepository.service';
 import { DEPARTMENT_REPOSITORY } from './core/domain/ports/department.repo';
 
+import { PositionApiRepository } from './infrastructure/positionApiRepository.service';
+import { POSITION_REPOSITORY } from './core/domain/ports/position.repo';
+
 export const appConfig: ApplicationConfig = {
   providers: [
     provideZoneChangeDetection({ eventCoalescing: true }), 
@@ -20,6 +23,8 @@ export const appConfig: ApplicationConfig = {
     provideHttpClient(withInterceptors([authInterceptor])),
     { provide: USER_REPOSITORY, useClass: UserApiRepository },
     { provide: ROLE_REPOSITORY, useClass: RoleApiRepository },
-    { provide: DEPARTMENT_REPOSITORY, useClass: DepartmentApiRepository }
+    { provide: DEPARTMENT_REPOSITORY, useClass: DepartmentApiRepository },
+    { provide: POSITION_REPOSITORY, useClass: PositionApiRepository }
   ]
 };
+

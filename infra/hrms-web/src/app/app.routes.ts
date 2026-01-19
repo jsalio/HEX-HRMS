@@ -32,7 +32,7 @@ export const routes: Routes = [
       },
       {
         path: 'positions',
-        loadComponent: () => import('./ui/site/home/home.component').then(m => m.HomeComponent) // TODO: Create PositionsComponent
+        loadComponent: () => import('./ui/site/position/position.component').then(m => m.PositionComponent)
       },
       {
         path: 'attendance',

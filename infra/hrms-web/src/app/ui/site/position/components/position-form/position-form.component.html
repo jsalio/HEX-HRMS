@@ -1,0 +1,101 @@
+<div class="modal-overlay" (click)="close()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+            <h3>{{ position() ? 'Editar Puesto' : 'Nuevo Puesto' }}</h3>
+            <button class="btn-close" (click)="close()">×</button>
+        </div>
+
+        <div class="modal-body">
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="code">Código *</label>
+                    <input type="text" id="code" [value]="code()" (input)="code.set($any($event.target).value)"
+                        placeholder="Ej: DEV-001" />
+                </div>
+                <div class="form-group">
+                    <label for="title">Título *</label>
+                    <input type="text" id="title" [value]="title()" (input)="title.set($any($event.target).value)"
+                        placeholder="Nombre del puesto" />
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="description">Descripción</label>
+                <textarea id="description" rows="3" [value]="description()"
+                    (input)="description.set($any($event.target).value)"
+                    placeholder="Descripción del puesto..."></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="requiredSkills">Habilidades Requeridas</label>
+                <textarea id="requiredSkills" rows="3" [value]="requiredSkills()"
+                    (input)="requiredSkills.set($any($event.target).value)"
+                    placeholder="Lista de habilidades requeridas..."></textarea>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="salaryMin">Salario Mínimo</label>
+                    <input type="number" id="salaryMin" [value]="salaryMin()"
+                        (input)="salaryMin.set(+$any($event.target).value)" />
+                </div>
+                <div class="form-group">
+                    <label for="salaryMax">Salario Máximo</label>
+                    <input type="number" id="salaryMax" [value]="salaryMax()"
+                        (input)="salaryMax.set(+$any($event.target).value)" />
+                </div>
+                <div class="form-group">
+                    <label for="currency">Moneda</label>
+                    <select id="currency" [value]="currency()" (change)="currency.set($any($event.target).value)">
+                        <option value="USD">USD</option>
+                        <option value="EUR">EUR</option>
+                        <option value="DOP">DOP</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="maxEmployees">Máx. Empleados *</label>
+                    <input type="number" id="maxEmployees" min="1" [value]="maxEmployees()"
+                        (input)="maxEmployees.set(+$any($event.target).value)" />
+                </div>
+                <div class="form-group">
+                    <label for="workType">Modalidad</label>
+                    <select id="workType" [value]="workType()" (change)="workType.set($any($event.target).value)">
+                        @for (wt of workTypes; track wt.value) {
+                        <option [value]="wt.value">{{ wt.label }}</option>
+                        }
+                    </select>
+                </div>
+                @if (position()) {
+                <div class="form-group">
+                    <label for="status">Estado</label>
+                    <select id="status" [value]="status()" (change)="status.set($any($event.target).value)">
+                        @for (s of statuses; track s.value) {
+                        <option [value]="s.value">{{ s.label }}</option>
+                        }
+                    </select>
+                </div>
+                }
+            </div>
+
+            <div class="form-group">
+                <label for="department">Departamento *</label>
+                <select id="department" [value]="departmentId()" (change)="departmentId.set($any($event.target).value)">
+                    <option value="">Seleccione departamento</option>
+                    @for (dept of departments(); track dept.id) {
+                    <option [value]="dept.id">{{ dept.name }}</option>
+                    }
+                </select>
+            </div>
+        </div>
+
+        <div class="modal-footer">
+            <button class="btn-secondary" (click)="close()" [disabled]="saving()">Cancelar</button>
+            <button class="btn-primary" (click)="save()" [disabled]="!isValid() || saving()">
+                {{ saving() ? 'Guardando...' : (position() ? 'Actualizar' : 'Crear') }}
+            </button>
+        </div>
+    </div>
+</div>

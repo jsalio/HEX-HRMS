@@ -8,23 +8,25 @@ import (
 )
 
 type PositionGorm struct {
-	ID           string          `gorm:"primaryKey;type:uuid;default:gen_random_uuid()"`
-	Title        string          `gorm:"type:varchar(255)"`
-	Code         string          `gorm:"type:varchar(255)"`
-	Description  string          `gorm:"type:text"`
-	SalaryMin    float32         `gorm:"type:decimal(10,2)"`
-	SalaryMax    float32         `gorm:"type:decimal(10,2)"`
-	Currency     string          `gorm:"type:varchar(255)"`
-	WorkType     string          `gorm:"type:varchar(255)"`
-	DepartmentID string          `gorm:"type:varchar(255)"`
-	CreatedAt    time.Time       `gorm:"autoCreateTime"`
-	UpdatedAt    time.Time       `gorm:"autoUpdateTime"`
-	CreatedByID  uint            `gorm:"type:integer"`
-	UpdatedByID  uint            `gorm:"type:integer"`
-	Department   *DepartmentGorm `gorm:"foreignKey:DepartmentID"`
-	User         *UserGorm       `gorm:"foreignKey:UpdatedByID"`
-	Status       string          `gorm:"type:varchar(255)"`
-	DeletedAt    gorm.DeletedAt  `gorm:"index"`
+	ID             string          `gorm:"primaryKey;type:uuid;default:gen_random_uuid()"`
+	Title          string          `gorm:"type:varchar(255)"`
+	Code           string          `gorm:"type:varchar(255);unique"`
+	Description    string          `gorm:"type:text"`
+	RequiredSkills string          `gorm:"type:text"`
+	SalaryMin      float32         `gorm:"type:decimal(10,2)"`
+	SalaryMax      float32         `gorm:"type:decimal(10,2)"`
+	MaxEmployees   int             `gorm:"type:integer;default:1"`
+	Currency       string          `gorm:"type:varchar(255)"`
+	WorkType       string          `gorm:"type:varchar(255)"`
+	DepartmentID   string          `gorm:"type:varchar(255)"`
+	CreatedAt      time.Time       `gorm:"autoCreateTime"`
+	UpdatedAt      time.Time       `gorm:"autoUpdateTime"`
+	CreatedByID    uint            `gorm:"type:integer"`
+	UpdatedByID    uint            `gorm:"type:integer"`
+	Department     *DepartmentGorm `gorm:"foreignKey:DepartmentID"`
+	User           *UserGorm       `gorm:"foreignKey:UpdatedByID"`
+	Status         string          `gorm:"type:varchar(255);default:'Active'"`
+	DeletedAt      gorm.DeletedAt  `gorm:"index"`
 }
 
 func (t PositionGorm) TableName() string {
@@ -45,22 +47,24 @@ func (t PositionGorm) ToModel() models.Position {
 	}
 
 	return models.Position{
-		ID:           t.ID,
-		Title:        t.Title,
-		Code:         t.Code,
-		Description:  t.Description,
-		SalaryMin:    t.SalaryMin,
-		SalaryMax:    t.SalaryMax,
-		Currency:     t.Currency,
-		WorkType:     models.WotkType(t.WorkType),
-		DepartmentID: t.DepartmentID,
-		CreatedAt:    t.CreatedAt,
-		UpdatedAt:    t.UpdatedAt,
-		CreatedByID:  t.CreatedByID,
-		UpdatedByID:  t.UpdatedByID,
-		Department:   dept,
-		User:         user,
-		Status:       models.PositionStatus(t.Status),
+		ID:             t.ID,
+		Title:          t.Title,
+		Code:           t.Code,
+		Description:    t.Description,
+		RequiredSkills: t.RequiredSkills,
+		SalaryMin:      t.SalaryMin,
+		SalaryMax:      t.SalaryMax,
+		MaxEmployees:   t.MaxEmployees,
+		Currency:       t.Currency,
+		WorkType:       models.WotkType(t.WorkType),
+		DepartmentID:   t.DepartmentID,
+		CreatedAt:      t.CreatedAt,
+		UpdatedAt:      t.UpdatedAt,
+		CreatedByID:    t.CreatedByID,
+		UpdatedByID:    t.UpdatedByID,
+		Department:     dept,
+		User:           user,
+		Status:         models.PositionStatus(t.Status),
 	}
 }
 
@@ -87,22 +91,24 @@ func PositionGormToEntity(t models.Position) PositionGorm {
 	}
 
 	return PositionGorm{
-		ID:           t.ID,
-		Title:        t.Title,
-		Code:         t.Code,
-		Description:  t.Description,
-		SalaryMin:    t.SalaryMin,
-		SalaryMax:    t.SalaryMax,
-		Currency:     t.Currency,
-		WorkType:     string(t.WorkType),
-		DepartmentID: t.DepartmentID,
-		CreatedAt:    t.CreatedAt,
-		UpdatedAt:    t.UpdatedAt,
-		CreatedByID:  t.CreatedByID,
-		UpdatedByID:  t.UpdatedByID,
-		Department:   dept,
-		User:         user,
-		Status:       string(t.Status),
+		ID:             t.ID,
+		Title:          t.Title,
+		Code:           t.Code,
+		Description:    t.Description,
+		RequiredSkills: t.RequiredSkills,
+		SalaryMin:      t.SalaryMin,
+		SalaryMax:      t.SalaryMax,
+		MaxEmployees:   t.MaxEmployees,
+		Currency:       t.Currency,
+		WorkType:       string(t.WorkType),
+		DepartmentID:   t.DepartmentID,
+		CreatedAt:      t.CreatedAt,
+		UpdatedAt:      t.UpdatedAt,
+		CreatedByID:    t.CreatedByID,
+		UpdatedByID:    t.UpdatedByID,
+		Department:     dept,
+		User:           user,
+		Status:         string(t.Status),
 	}
 }
 
