@@ -1,11 +1,13 @@
-<div class="p-8 animate-slide-in">
-    <div class="flex justify-between items-center mb-6">
-        <h2 class="font-bold text-gray-700 text-lg">Departments</h2>
-        <button (click)="createNew()" class="text-primary-600 text-sm font-semibold hover:underline">+ Add New
-            Department</button>
+<div class="animate-slide-in">
+    <div class="p-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
+        <h2 class="font-bold text-gray-700">Departments</h2>
+        <button (click)="createNew()"
+            class="bg-primary-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-primary-700 transition-colors shadow-sm">
+            + Add New Department
+        </button>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div class="p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         @for (dept of departments; track dept.id) {
         <div class="p-6 rounded-2xl border border-gray-100 bg-gray-50/30 hover:shadow-md transition-all group">
             <div class="flex justify-between items-start mb-4">

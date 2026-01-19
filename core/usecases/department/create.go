@@ -23,10 +23,7 @@ func (u *CreateDepartmentUseCase) Validate() *models.SystemError {
 	if request.Name == "" {
 		return models.NewSystemError(models.SystemErrorCodeInternal, models.SystemErrorTypeValidation, models.SystemErrorLevelWarning, "Name is empty", nil)
 	}
-	raw, err := u.repository.Exists("name", request.Name)
-	if err != nil {
-		return models.NewSystemError(models.SystemErrorCodeInternal, models.SystemErrorTypeValidation, models.SystemErrorLevelWarning, "Error on repository", nil)
-	}
+	raw, _ := u.repository.Exists("name", request.Name)
 	if raw {
 		return models.NewSystemError(models.SystemErrorCodeInternal, models.SystemErrorTypeValidation, models.SystemErrorLevelWarning, "Name already exists", nil)
 	}

@@ -1,1 +1,22 @@
-<p>department works!</p>
+<div class="department-container animate-fade-in p-6 max-w-7xl mx-auto">
+    <!-- Header -->
+    <div class="flex justify-between items-end mb-8">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-800">Departments</h1>
+            <p class="text-gray-500 mt-1">Manage company departments and organizational structure</p>
+        </div>
+    </div>
+
+    <!-- Content Card -->
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden min-h-[500px]">
+        <app-department-list [departments]="departments()" (create)="createDepartment()" (edit)="editDepartment($event)"
+            (delete)="deleteDepartment($event)">
+        </app-department-list>
+    </div>
+
+    <!-- Modal Form -->
+    @if (showForm()) {
+    <app-department-form [department]="selectedDepartment()" (cancel)="closeForm()" (saved)="onSaved()">
+    </app-department-form>
+    }
+</div>
