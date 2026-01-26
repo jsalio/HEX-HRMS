@@ -33,6 +33,7 @@ type Server struct {
 		departmentContract contracts.DepartmentContract
 		roleContract       contracts.RoleContract
 		permissionContract contracts.PermissionContract
+		positionContract   contracts.PositionContract
 	}
 	cryptographyContext contracts.CryptographyContract
 }
@@ -73,6 +74,8 @@ func (s *Server) SetupControllers() {
 	s.appController = []BaseController.Controller{
 		controller.NewUserController(s.authMiddleware, s.context.userContract, s.cryptographyContext),
 		controller.NewRoleController(s.authMiddleware, s.context.roleContract, s.context.permissionContract),
+		controller.NewDepartmentController(s.context.departmentContract, s.authMiddleware),
+		controller.NewPositionController(s.context.positionContract, s.authMiddleware),
 	}
 }
 
@@ -86,6 +89,7 @@ func (s *Server) SetupContext() {
 	s.context.departmentContract = context.DepartmentContract
 	s.context.roleContract = context.RoleContract
 	s.context.permissionContract = context.PermissionContract
+	s.context.positionContract = context.PositionContract
 	s.cryptographyContext = security.NewSecurityImpl()
 }
 

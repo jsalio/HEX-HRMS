@@ -20,6 +20,7 @@ type Context struct {
 	DepartmentContract contracts.DepartmentContract
 	RoleContract       contracts.RoleContract
 	PermissionContract contracts.PermissionContract
+	PositionContract   contracts.PositionContract
 }
 
 func NewContext(dns string) (*Context, models.SystemError) {
@@ -35,12 +36,14 @@ func NewContext(dns string) (*Context, models.SystemError) {
 	if err := migrate(db); err.Code != models.SystemErrorCodeNone {
 		return nil, err
 	}
+	positionRepo := repo.NewPositionRepository(db)
 	return &Context{
 		DB:                 db,
 		UserContract:       repo.NewUserRepository(db),
 		DepartmentContract: repo.NewDepartmentRepository(db),
 		RoleContract:       repo.NewRoleRepository(db),
 		PermissionContract: repo.NewPermissionRepository(db),
+		PositionContract:   &positionRepo,
 	}, models.SystemError{}
 }
 
@@ -58,6 +61,7 @@ func migrate(db *gorm.DB) models.SystemError {
 	if err := db.AutoMigrate(
 		&repo.UserGorm{},
 		&repo.DepartmentGorm{},
+		&repo.PositionGorm{},
 		&gormModels.RoleGorm{},
 		&gormModels.PermissionGorm{},
 	); err != nil {

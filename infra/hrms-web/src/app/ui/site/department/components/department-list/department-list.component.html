@@ -1,0 +1,36 @@
+<div class="animate-slide-in">
+    <div class="p-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
+        <h2 class="font-bold text-gray-700">Departments</h2>
+        <button (click)="createNew()"
+            class="bg-primary-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-primary-700 transition-colors shadow-sm">
+            + Add New Department
+        </button>
+    </div>
+
+    <div class="p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        @for (dept of departments; track dept.id) {
+        <div class="p-6 rounded-2xl border border-gray-100 bg-gray-50/30 hover:shadow-md transition-all group">
+            <div class="flex justify-between items-start mb-4">
+                <div class="p-3 bg-white rounded-xl shadow-sm group-hover:bg-primary-50 transition-colors">
+                    <span class="text-2xl">🏢</span>
+                </div>
+                <div class="flex space-x-2">
+                    <button (click)="editDepartment(dept)" class="text-gray-400 hover:text-blue-600 transition-colors"
+                        title="Edit">✏️</button>
+                    <button (click)="deleteDepartment(dept.id)"
+                        class="text-gray-400 hover:text-red-600 transition-colors" title="Delete">🗑️</button>
+                </div>
+            </div>
+            <h3 class="font-bold text-gray-800 text-lg cursor-pointer" (click)="editDepartment(dept)">{{ dept.name }}
+            </h3>
+        </div>
+        }
+
+        @if (departments.length === 0) {
+        <div class="col-span-3 text-center py-12 text-gray-400">
+            <span class="text-4xl block mb-2">🏢</span>
+            <p>No departments yet. Click "Add New Department" to create one.</p>
+        </div>
+        }
+    </div>
+</div>

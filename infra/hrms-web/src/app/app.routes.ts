@@ -28,11 +28,11 @@ export const routes: Routes = [
       },
       {
         path: 'departments',
-        loadComponent: () => import('./ui/site/home/home.component').then(m => m.HomeComponent) // TODO: Create DepartmentsComponent
+        loadComponent: () => import('./ui/site/department/department.component').then(m => m.DepartmentComponent) // TODO: Create DepartmentsComponent
       },
       {
         path: 'positions',
-        loadComponent: () => import('./ui/site/home/home.component').then(m => m.HomeComponent) // TODO: Create PositionsComponent
+        loadComponent: () => import('./ui/site/position/position.component').then(m => m.PositionComponent)
       },
       {
         path: 'attendance',

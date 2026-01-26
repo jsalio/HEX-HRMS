@@ -3,7 +3,7 @@
     <div class="flex justify-between items-end mb-8">
         <div>
             <h1 class="text-3xl font-bold text-gray-800">Settings</h1>
-            <p class="text-gray-500 mt-1">Manage system users, roles and configurations</p>
+            <p class="text-gray-500 mt-1">Manage system users, roles, departments and configurations</p>
         </div>
         <div class="flex space-x-2 bg-gray-100 p-1 rounded-xl shadow-inner">
             <button (click)="setTab('users')" [class.bg-white]="activeTab() === 'users'"
@@ -15,6 +15,12 @@
                 [class.text-primary-600]="activeTab() === 'roles'" [class.shadow-sm]="activeTab() === 'roles'"
                 class="px-6 py-2 rounded-lg text-sm font-semibold transition-all duration-200 hover:text-primary-500">
                 Roles
+            </button>
+            <button (click)="setTab('departments')" [class.bg-white]="activeTab() === 'departments'"
+                [class.text-primary-600]="activeTab() === 'departments'"
+                [class.shadow-sm]="activeTab() === 'departments'"
+                class="px-6 py-2 rounded-lg text-sm font-semibold transition-all duration-200 hover:text-primary-500">
+                Departments
             </button>
         </div>
     </div>
@@ -30,6 +36,7 @@
         </app-user-list>
         }
 
+        <!-- Roles Tab -->
         @if (activeTab() === 'roles') {
         <app-role-list [roles]="roles()" (create)="createRole()" (edit)="editRole($event)">
         </app-role-list>
@@ -37,6 +44,19 @@
         @if (showRoleForm()) {
         <app-role-form [role]="selectedRole()" (cancel)="closeRoleForm()" (saved)="onRoleSaved()">
         </app-role-form>
+        }
+        }
+
+        <!-- Departments Tab -->
+        @if (activeTab() === 'departments') {
+        <app-department-list [departments]="departments()" (create)="createDepartment()" (edit)="editDepartment($event)"
+            (delete)="deleteDepartmentAction($event)">
+        </app-department-list>
+
+        @if (showDepartmentForm()) {
+        <app-department-form [department]="selectedDepartment()" (cancel)="closeDepartmentForm()"
+            (saved)="onDepartmentSaved()">
+        </app-department-form>
         }
         }
     </div>

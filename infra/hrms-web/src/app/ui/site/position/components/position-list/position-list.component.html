@@ -1,0 +1,58 @@
+@if (loading()) {
+<div class="loading">
+    <div class="spinner"></div>
+    <p>Cargando puestos...</p>
+</div>
+} @else if (positions().length === 0) {
+<div class="empty-state">
+    <p>No hay puestos registrados</p>
+</div>
+} @else {
+<div class="table-container">
+    <table class="position-table">
+        <thead>
+            <tr>
+                <th>Código</th>
+                <th>Título</th>
+                <th>Descripción</th>
+                <th>Salario</th>
+                <th>Max. Empleados</th>
+                <th>Modalidad</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @for (position of positions(); track position.id) {
+            <tr>
+                <td class="code-cell">{{ position.code }}</td>
+                <td class="title-cell">{{ position.title }}</td>
+                <td class="description-cell">{{ position.description | slice:0:50 }}{{ position.description.length > 50
+                    ? '...' : '' }}</td>
+                <td class="salary-cell">
+                    {{ position.currency }} {{ position.salaryMin | number:'1.0-0' }} - {{ position.salaryMax |
+                    number:'1.0-0' }}
+                </td>
+                <td class="max-employees-cell">{{ position.maxEmployees }}</td>
+                <td class="worktype-cell">
+                    <span class="badge badge-worktype">{{ getWorkTypeLabel(position.workType) }}</span>
+                </td>
+                <td class="status-cell">
+                    <span class="badge" [ngClass]="getStatusClass(position.status)">
+                        {{ getStatusLabel(position.status) }}
+                    </span>
+                </td>
+                <td class="actions-cell">
+                    <button class="btn-icon btn-edit" (click)="edit.emit(position)" title="Editar">
+                        ✏️
+                    </button>
+                    <button class="btn-icon btn-delete" (click)="delete.emit(position.id)" title="Eliminar">
+                        🗑️
+                    </button>
+                </td>
+            </tr>
+            }
+        </tbody>
+    </table>
+</div>
+}
